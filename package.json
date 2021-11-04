@@ -1,0 +1,25 @@
+{
+  "name": "graffit",
+  "version": "1.0.0",
+  "description": "Check me out site",
+  "main": "example.js",
+  "scripts": {
+    "start": "node example.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/La7rodectus/graffit.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/La7rodectus/graffit/issues"
+  },
+  "homepage": "https://github.com/La7rodectus/graffit#readme",
+  "dependencies": {
+    "eslint": "^8.1.0",
+    "mysql": "^2.18.1"
+  }
+}
