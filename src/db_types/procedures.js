@@ -1,5 +1,4 @@
-const replaceAt = require('../helpers.js').replaceAt;
-const { wrapStr, wrapUpdateObjFields } = require('../helpers.js');
+const { replaceAt, wrapStr, wrapUpdateObjFields } = require('../../helpers.js');
 
 
 const insertIntoTable = (conn, tableName, insertObj) => {

@@ -16,8 +16,9 @@ module.exports.default = class DatabaseDataValidator {
     for (const tableName in tables) {
       const table = tables[tableName];
       const tableValidator = {};
-      for (const field in table) {
-        let type = table[field];
+      const tableFields = table.fields;
+      for (const field in tableFields) {
+        let type = tableFields[field];
         type = type.substr(0, type.length - 1).split('(');
         tableValidator[field] = this._createValidationFunc(type);
       }

@@ -1,9 +1,9 @@
-const Procedures = require('./procedures.js');
+const Procedures = require('./db_types/procedures.js');
 const ConnectionsController = require('./connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
 
 const defaultOptions = {
-  dbdv: DatabaseDataValidator,
+  Dbdv: DatabaseDataValidator,
 };
 
 //data base controller
@@ -11,7 +11,7 @@ module.exports.default = class DBC {
   constructor(conn_obj, options = {}) {
     this._conn = null;
     this.options = { ...defaultOptions, ...options };
-    this.dbdv = options.dbdv;                            // DatabaseDataValidator
+    this.dbdv = options.Dbdv;                            // DatabaseDataValidator
     this.cc = new ConnectionsController(conn_obj);       // ConnectionController
     this.schema = null;
   }
@@ -38,7 +38,8 @@ module.exports.default = class DBC {
       }
       const schema = dbSchema ? dbSchema : await this.queryDbSchema();
       this.schema = schema;
-      this.dbdv = new this.options.dbdv(this.schema);
+      console.log(schema.tables);
+      this.dbdv = new this.options.Dbdv(this.schema);
       resolve();
     } catch (err) {
       reject(err);
@@ -62,9 +63,16 @@ module.exports.default = class DBC {
         if (data.length === 0) throw new Error('Empty Tables!');
         for (let i = 0; i < tableNames.length; i++) {
           const tableFields = data[i];
-          schema.tables[tableNames[i]] = {};
+          schema.tables[tableNames[i]] = {
+            fields: {},
+            FK: [],
+            PK: undefined,
+          };
           for (const fieldRow of tableFields) {
-            schema.tables[tableNames[i]][fieldRow.Field] = fieldRow.Type;
+            const isNull = fieldRow.Null === 'YES' ? null : '';
+            schema.tables[tableNames[i]].fields[fieldRow.Field] = fieldRow.Type + `|${isNull}`;
+            if (fieldRow.Key === 'PRI') schema.tables[tableNames[i]].PK = fieldRow.Field;
+            else if (fieldRow.Key === 'MUL') schema.tables[tableNames[i]].FK.push(fieldRow.Field);
           }
         }
         resolve(schema);
@@ -74,14 +82,14 @@ module.exports.default = class DBC {
     }
   });
 
-  insertBank = (updateObj) => Procedures.insertIntoTable(this._conn, 'Banks', updateObj);
+  // insertBank = (updateObj) => Procedures.insertIntoTable(this._conn, 'Banks', updateObj);
 
-  updateBankByName = (name, updateObj) => Procedures.updateTable(this._conn, 'Banks', 'bankName', name, updateObj);
+  // updateBankByName = (name, updateObj) => Procedures.updateTable(this._conn, 'Banks', 'bankName', name, updateObj);
 
-  deleteFromBankByName = (name) => Procedures.deleteRowsFromTable(this._conn, 'Banks', 'bankName', name);
+  // deleteFromBankByName = (name) => Procedures.deleteRowsFromTable(this._conn, 'Banks', 'bankName', name);
 
-  getAllBanks = () => Procedures.getAllFromTable(this._conn, 'Banks');
+  // getAllBanks = () => Procedures.getAllFromTable(this._conn, 'Banks');
 
-  getBankByName = (name) => Procedures.getFromTableBy(this._conn, 'Banks', 'bankName', name);
+  // getBankByName = (name) => Procedures.getFromTableBy(this._conn, 'Banks', 'bankName', name);
 
 }
