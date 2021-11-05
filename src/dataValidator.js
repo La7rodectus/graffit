@@ -11,7 +11,8 @@ module.exports.default = class DatabaseDataValidator {
     this.validationSchema = this._parseSchema(schema);
   }
 
-  _parseSchema(schema) {
+  _parseSchema(inputSchema) {
+    const schema = JSON.parse(JSON.stringify(inputSchema));
     const tables = schema.tables;
     for (const tableName in tables) {
       const table = tables[tableName];

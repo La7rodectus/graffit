@@ -1,4 +1,4 @@
-const DBC = require('./src/dbc.js').default;
+const Graffit = require('./src/graffit.js').default;
 
 const connObj = {
   host: 'sql4.freemysqlhosting.net',
@@ -8,15 +8,14 @@ const connObj = {
 };
 
 console.log('Example start');
-const dbc = new DBC(connObj);
-
 (async () => {
   let res;
 
   try {
+    const dbc = Graffit.createController(connObj);
     const err = await dbc.init();
     if (err) return console.log('const error connect:', err);
-
+    res = dbc.getSchema();
   } catch (err) {
     console.log('catch error:', err);
   }

@@ -46,6 +46,10 @@ module.exports.default = class DBC {
     }
   });
 
+  getSchema() {
+    return this.schema;
+  }
+
   queryDbSchema = () => new Promise(async (resolve, reject) => {
     try {
       const schema = {

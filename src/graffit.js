@@ -1,10 +1,10 @@
+const DBC = require('./dbc.js').default;
 
-
-class Graffit {
+module.exports.default = class Graffit {
   constructor() {}
 
-  createController(connObj, options) {
-    
+  static createController(connObj, options) {
+    return new DBC(connObj, options);
   }
 
-}
+};
