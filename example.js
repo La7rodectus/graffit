@@ -15,7 +15,7 @@ console.log('Example start');
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init();
     if (err) return console.log('const error connect:', err);
-    res = dbc.getSchema();
+    res = await dbc.Persons.getAll();
   } catch (err) {
     console.log('catch error:', err);
   }

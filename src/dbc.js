@@ -1,6 +1,7 @@
 const Procedures = require('./db_types/procedures.js');
 const ConnectionsController = require('./connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
+const SqlInstance = require('./db_types/sqlInstance.js').default;
 
 const defaultOptions = {
   Dbdv: DatabaseDataValidator,
@@ -78,6 +79,9 @@ module.exports.default = class DBC {
             if (fieldRow.Key === 'PRI') schema.tables[tableNames[i]].PK = fieldRow.Field;
             else if (fieldRow.Key === 'MUL') schema.tables[tableNames[i]].FK.push(fieldRow.Field);
           }
+          const tableData = schema.tables[tableNames[i]];
+          tableData.name = tableNames[i];
+          this[tableNames[i]] = new SqlInstance(tableData);
         }
         resolve(schema);
       });

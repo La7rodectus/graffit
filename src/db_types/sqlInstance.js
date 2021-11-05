@@ -1,16 +1,30 @@
 const { wrapStr, wrapUpdateObjFields } = require('../../helpers.js');
+const Instance = require('./instance_intf.js').default;
 
-module.exports.default = class SqlInstance {
+module.exports.default = class SqlInstance extends Instance {
   constructor(tableData) {
+    super();
     this.name = tableData.name;
     this.fields = tableData.fields;
     this.PK = tableData.PK;  //String
-    this.FK = tableData.AK;  //[String, String]
+    this.FK = tableData.FK;  //[String, String]
   }
 
   async get(conn, pk) {
     const wrappedPk = wrapStr(pk);
     const q = `SELECT * FROM ${this.name} WHERE ${this.PK} = ${wrappedPk};`;
+    return new Promise((resolve, reject) => {
+      conn.query(q, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    });
+  }
+
+  async getAll(conn) {
+    const q = `SELECT * FROM ${this.name}`;
     return new Promise((resolve, reject) => {
       conn.query(q, (err, res) => {
         if (err) {
