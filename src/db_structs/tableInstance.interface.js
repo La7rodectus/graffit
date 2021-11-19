@@ -1,6 +1,6 @@
 'use strict';
 
-class Instance {
+class TableInstance {
 
   constructor() {}
 
@@ -16,5 +16,5 @@ class Instance {
 
 };
 
-module.exports.default = Instance;
+module.exports.default = TableInstance;
 

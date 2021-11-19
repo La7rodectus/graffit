@@ -1,16 +1,19 @@
+'use strict';
+
 const replaceAt = (str, index, replacement) => {
   return str.substr(0, index) + replacement + str.substr(index + replacement.length);
 };
 
-const wrapStr = (str) => str = typeof str === 'string' ? `'${str}'` : str;
+const wrapString = (str) => str = typeof str === 'string' ? `'${str}'` : str;
 
-const wrapUpdateObjFields = (updateObj) => {
-  const wrapped = { ...updateObj };
-  for (const field in updateObj) {
-    wrapped[field] = wrapStr(updateObj[field]);
+const wrapObjectFields = (object) => {
+  const wrapped = { ...object };
+  for (const field in object) {
+    wrapped[field] = wrapString(object[field]);
   }
   return wrapped;
 }
+
 const parseUrlArgs = (stringToParse) => {
   return JSON.parse('{"' + stringToParse.replace(/&/g, '","').replace(/=/g,'":"') + '"}', (key, value) => {
     return key === "" ? value : decodeURIComponent(value);
@@ -19,8 +22,7 @@ const parseUrlArgs = (stringToParse) => {
 
 module.exports = {
   replaceAt,
-  wrapStr,
-  wrapUpdateObjFields,
+  wrapString,
+  wrapObjectFields,
   parseUrlArgs,
-
 };

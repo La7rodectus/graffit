@@ -1,6 +1,6 @@
 const DBC = require('./dbc.js').default;
 
-module.exports.default = class Graffit {
+class Graffit {
   constructor() {}
 
   static createController(connObj, options) {
@@ -8,3 +8,5 @@ module.exports.default = class Graffit {
   }
 
 };
+
+module.exports.default = Graffit;

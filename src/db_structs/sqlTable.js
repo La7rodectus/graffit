@@ -1,103 +1,73 @@
-const { wrapStr, wrapUpdateObjFields } = require('../../helpers.js');
-const Instance = require('./instance.intf.js').default;
+const { wrapString, wrapObjectFields } = require('../../helpers.js');
+const TableInstance = require('./tableInstance.interface.js').default;
 
-class SqlTable extends Instance {
+class SqlTable extends TableInstance {
   constructor(connProvider, tableData) {
     super();
     this.connProvider = connProvider;
     this.name = tableData.name;
     this.fields = tableData.fields;
-    this.PK = tableData.PK;  //String
-    this.FK = tableData.FK;  //[String, String]
+    this.PK = tableData.PK;  // name String
+    this.FK = tableData.FK;  //[name String, name String ...]
   }
 
-
-  async get(pk) {
-    const wrappedPk = wrapStr(pk);
-    const q = `SELECT * FROM ${this.name} WHERE ${this.PK} = ${wrappedPk};`;
-    const conn = await this.connProvider.getConnection();
+  //check after
+  async executeQuery(query) {
+    const {conn, err} = await this.connProvider.getConnection();
+    if (err) return {conn, err};
     return new Promise((resolve, reject) => {
-      conn.query(q, (err, res) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(res);
+      conn.query(query, (err, script) => {
+        if (err) reject(err);
+        else resolve(script);
       });
     });
+  }
+
+  async getByPK(pk) {
+    const wrappedPk = wrapString(pk);
+    const query = `SELECT * 
+                   FROM ${this.name} 
+                   WHERE ${this.PK} = ${wrappedPk};`;
+    return await this.executeQuery(query);
   }
 
   async getAll() {
-    const q = `SELECT * FROM ${this.name}`;
-    const conn = await this.connProvider.getConnection();
-    return new Promise((resolve, reject) => {
-      conn.query(q, (err, res) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(res);
-      });
-    });
+    const query = `SELECT * FROM ${this.name}`;
+    return await this.executeQuery(query);
   }
 
-  async delete(pk) {
-    const wrappedPk = wrapStr(pk);
-    const q = `DELETE FROM ${this.name} WHERE ${this.PK} = ${wrappedPk};`;
-    const conn = await this.connProvider.getConnection();
-    return new Promise((resolve, reject) => {
-      conn.query(q, (err, res) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(res);
-      });
-    });
+  async deleteByPK(pk) {
+    const wrappedPk = wrapString(pk);
+    const query = `DELETE FROM ${this.name} 
+                   WHERE ${this.PK} = ${wrappedPk};`;
+    return await this.executeQuery(query);
   }
 
-  async update(pk, updateObj) {
-    const wrappedUpdateObj = wrapUpdateObjFields(updateObj);
-    const wrappedPk = wrapStr(pk);
+  async updateByPK(pk, object) {
+    const wrappedPk = wrapString(pk);
+    const wrappedObject = wrapObjectFields(object);
     let setRow = '';
-    for (const field in wrappedUpdateObj) {
-      setRow += `${field} = ${wrappedUpdateObj[field]},\n`;
+    for (const field in wrappedObject) {
+      setRow += `${field} = ${wrappedObject[field]},\n`;
     }
     const lastComaId = setRow.lastIndexOf(',');
     setRow = replaceAt(setRow, lastComaId, ' ');
-    const q = `
-      UPDATE ${this.name}
-      SET
-        ${setRow}
-      WHERE
-        ${this.PK} = ${wrappedPk};
-    `;
-    return new Promise((resolve, reject) => {
-      conn.query(q, (err, res) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(res);
-      });
-    });
+    const query = `UPDATE ${this.name}
+                   SET ${setRow}
+                   WHERE ${this.PK} = ${wrappedPk};`;
+    return await this.executeQuery(query);
   }
 
-  async insert(insertObj) {
-    const wrappedInsertObj = wrapUpdateObjFields(insertObj);
-    const values = Object.values(wrappedInsertObj).join(', ');
-    const fields = Object.keys(wrappedInsertObj).join(', ');
+  async insertByPK(object) {
+    const wrappedObject = wrapObjectFields(object);
+    const values = Object.values(wrappedObject).join(', ');
+    const fields = Object.keys(wrappedObject).join(', ');
     ///
     console.log(fields, '\n', values);
     ///
-    const q = `
-      INSERT INTO ${this.name} ( ${fields} )
-      VALUES ( ${values} );
-    `;
-    return new Promise((resolve, reject) => {
-      conn.query(q, (err, res) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(res);
-      });
-    });
+    const query = `INSERT INTO ${this.name} ( ${fields} )
+                   VALUES ( ${values} );`;
+    return await this.executeQuery(query);
   }
 
 };
