@@ -1,4 +1,4 @@
-const Procedures = require('./db_types/procedures.js');
+const Procedures = require('./db_structs/procedures.js');
 
 module.exports.default = class SchemaReader {
   constructor() {}

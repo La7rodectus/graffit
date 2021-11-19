@@ -1,7 +1,7 @@
 const Procedures = require('./db_types/procedures.js');
 const ConnectionsController = require('./connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
-const SqlInstance = require('./db_types/sqlInstance.js').default;
+const SqlTable = require('./db_types/sqlTable.js').default;
 
 const defaultOptions = {
   Dbdv: DatabaseDataValidator,
@@ -51,6 +51,11 @@ module.exports.default = class DBC {
     return this.schema;
   }
 
+  async getConnection() {
+    return await this.cc.getConnection();
+  }
+
+  // creates object from db schema
   queryDbSchema = () => new Promise(async (resolve, reject) => {
     try {
       const schema = {
@@ -81,7 +86,7 @@ module.exports.default = class DBC {
           }
           const tableData = schema.tables[tableNames[i]];
           tableData.name = tableNames[i];
-          this[tableNames[i]] = new SqlInstance(tableData);
+          this[tableNames[i]] = new SqlTable(dbc, tableData);
         }
         resolve(schema);
       });

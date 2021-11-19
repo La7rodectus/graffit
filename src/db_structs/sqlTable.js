@@ -1,18 +1,21 @@
 const { wrapStr, wrapUpdateObjFields } = require('../../helpers.js');
-const Instance = require('./instance_intf.js').default;
+const Instance = require('./instance.intf.js').default;
 
-module.exports.default = class SqlInstance extends Instance {
-  constructor(tableData) {
+class SqlTable extends Instance {
+  constructor(connProvider, tableData) {
     super();
+    this.connProvider = connProvider;
     this.name = tableData.name;
     this.fields = tableData.fields;
     this.PK = tableData.PK;  //String
     this.FK = tableData.FK;  //[String, String]
   }
 
-  async get(conn, pk) {
+
+  async get(pk) {
     const wrappedPk = wrapStr(pk);
     const q = `SELECT * FROM ${this.name} WHERE ${this.PK} = ${wrappedPk};`;
+    const conn = await this.connProvider.getConnection();
     return new Promise((resolve, reject) => {
       conn.query(q, (err, res) => {
         if (err) {
@@ -23,8 +26,9 @@ module.exports.default = class SqlInstance extends Instance {
     });
   }
 
-  async getAll(conn) {
+  async getAll() {
     const q = `SELECT * FROM ${this.name}`;
+    const conn = await this.connProvider.getConnection();
     return new Promise((resolve, reject) => {
       conn.query(q, (err, res) => {
         if (err) {
@@ -35,9 +39,10 @@ module.exports.default = class SqlInstance extends Instance {
     });
   }
 
-  async delete(conn, pk) {
+  async delete(pk) {
     const wrappedPk = wrapStr(pk);
     const q = `DELETE FROM ${this.name} WHERE ${this.PK} = ${wrappedPk};`;
+    const conn = await this.connProvider.getConnection();
     return new Promise((resolve, reject) => {
       conn.query(q, (err, res) => {
         if (err) {
@@ -48,7 +53,7 @@ module.exports.default = class SqlInstance extends Instance {
     });
   }
 
-  async update(conn, pk, updateObj) {
+  async update(pk, updateObj) {
     const wrappedUpdateObj = wrapUpdateObjFields(updateObj);
     const wrappedPk = wrapStr(pk);
     let setRow = '';
@@ -74,7 +79,7 @@ module.exports.default = class SqlInstance extends Instance {
     });
   }
 
-  async insert(conn, insertObj) {
+  async insert(insertObj) {
     const wrappedInsertObj = wrapUpdateObjFields(insertObj);
     const values = Object.values(wrappedInsertObj).join(', ');
     const fields = Object.keys(wrappedInsertObj).join(', ');
@@ -97,3 +102,4 @@ module.exports.default = class SqlInstance extends Instance {
 
 };
 
+module.exports = { SqlTable };
