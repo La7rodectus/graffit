@@ -1,7 +1,7 @@
 const Procedures = require('./db_structs/procedures.js');
 const ConnectionsController = require('./connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
-const SqlTable = require('./db_structs/sqlTable.js').SqlTable;
+const SqlTable = require('./db_structs/sqlTable.js').default;
 
 const defaultOptions = {
   Dbdv: DatabaseDataValidator,

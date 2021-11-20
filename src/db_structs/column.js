@@ -1,7 +1,8 @@
 
 class Column {
-  constructor(columnName, columnType) {}
-
+  constructor(rowData) {
+    
+  }
 
 }
  
