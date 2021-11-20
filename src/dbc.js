@@ -1,7 +1,7 @@
-const Procedures = require('./db_types/procedures.js');
+const Procedures = require('./db_structs/procedures.js');
 const ConnectionsController = require('./connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
-const SqlTable = require('./db_types/sqlTable.js').default;
+const SqlTable = require('./db_structs/sqlTable.js').default;
 
 const defaultOptions = {
   Dbdv: DatabaseDataValidator,
@@ -86,7 +86,7 @@ module.exports.default = class DBC {
           }
           const tableData = schema.tables[tableNames[i]];
           tableData.name = tableNames[i];
-          this[tableNames[i]] = new SqlTable(dbc, tableData);
+          this[tableNames[i]] = new SqlTable(this, tableData);
         }
         resolve(schema);
       });

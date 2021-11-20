@@ -102,4 +102,4 @@ class SqlTable extends Instance {
 
 };
 
-module.exports = { SqlTable };
+module.exports.default = SqlTable;
