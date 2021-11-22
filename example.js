@@ -20,7 +20,7 @@ console.log('Example start');
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
     await dbc.connDestroy();
     if (err) return console.log('const error connect:', err);
-    res = await dbc.flights.getAll();
+    res = await dbc.flights.get('flight_name', 'flight_date').orderBy('flight_name').do(); //.orderBy().do();
     await dbc.connDestroy();
   } catch (err) {
     console.log('catch error:', err);
