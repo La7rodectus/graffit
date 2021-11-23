@@ -1,43 +1,42 @@
+const ConnectionService = require('./connectionService.js');
 
 const defaultOptions = {
   maxConn: 5,
+
 };
 
 class ConnectionPool {
-  readyConn = new Map();
-  runningConn = new Map();
-  constructor(options) {
+  #availableConn = new Map();
+  #busyConn = new Map();
+
+  constructor(connObj, driverName, options) {
     this.options = { ...defaultOptions, ...options };
-
+    this.connObj = connObj;
+    this.cs = new ConnectionService(connObj, driverName);
   }
 
-  getNextConnId() {
-    return this.nextConnId++;
-  }
-  
   destroy() {
     console.log('destroy ConnectionPool called');
-    if (Object.keys(this.readyConn).length) {
-      for (const conn of Object.values(this.readyConn)) {
-        if (conn) conn.destroy();
-      }
-    }
-    if (Object.keys(this.runningConn).length) {
-      for (const conn of Object.values(this.runningConn)) {
-        if (conn) conn.destroy();
-      }
-    }
   }
+
   getReadyConn() {
-    const id = Object.keys(this.readyConn)[0];
-    return this.readyConn[id];
+    const id = this.#availableConn.keys()[0];
+    return this.#availableConn.get(id);
+  }
+
+  getConn() {
+    const conn = this.getReadyConn();
+    if (!conn) {
+      
+    }
   }
 
   moveConnToReady(conn) {
-    delete this.runningConn[conn._id];
-    this.readyConn[conn._id] = conn;
+    this.#busyConn.delete(conn.threadId);
+    this.#availableConn.set(conn.threadId, conn);
     this.updateConnCounter();
   }
+
   moveConnToRunning(conn) {
     this.runningConn[conn._id] = conn;
     delete this.readyConn[conn._id];

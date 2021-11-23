@@ -1,11 +1,12 @@
-const mysql = require('mysql');
 const process = require('process');
 const EventEmitter = require('events');
-const Connection = require('./connection.js').default;
+const ConnectionService = require('./connectionService.js').default;
 const ConnectionPool = require('./connectionPool.js').default;
 
 const defaultOptions = {
   maxConn: 5,
+  driverName: 'mysql',
+
 };
 
 class ConnectionController {
@@ -13,19 +14,21 @@ class ConnectionController {
 
   #constructorSetup() {
     this.ee.addListener('release', this.#destroyConn.bind(this));
-    this.ee.addListener('connDestroyed', () => console.log('conn destroy event called'));
-    // this.finalizer.register(this, { readyConn: this.readyConn, runningConn: this.runningConn });
+    this.ee.addListener('connDestroyed', this.#unregisterConn.bind(this));
+
+    this.finalizer = new FinalizationRegistry((heldVal) => this.destroy.bind(heldVal));
+    this.finalizer.register(this, { registeredConnections: this.registeredConnections });
+
     process.on('exit', this.destroy.bind(this));
     process.on('SIGINT', this.destroy.bind(this));
   }
 
-  constructor(conn_obj, options) {
-    this.conn_obj = conn_obj;
+  constructor(connObj, options) {
+    this.connObj = connObj;
     this.totalConn = 0;
-    this.nextConnId = 0;
     this.options = { ...defaultOptions, ...options };
     this.ee = new EventEmitter();
-    // this.finalizer = new FinalizationRegistry((heldVal) => this.finalizerCb(heldVal));
+    this.cs = new ConnectionService(connObj, this.options.driverName);
 
     this.#constructorSetup();
   }
@@ -58,27 +61,20 @@ class ConnectionController {
       this.#destroyConn(conn);
     }
   }
-
+  
   async createConn() {
     const connLimit = this.options.maxConn;
     if (this.totalConn >= connLimit) return { conn: null, err: `Conn limit is ${connLimit}` };
     try {
-      const conn = Connection.wrap(await mysql.createConnection(this.conn_obj), this.ee);
-      const cErr = await this.#connect(conn);
+      const conn = ConnectionService.wrap(await this.cs.create(), this.ee);
+      const cErr = await this.cs.connect(conn);
       if (cErr) return {conn: null, err: cErr};
       this.#registerConn(conn);
       return { conn, err: null };
     } catch (err) {
       return { conn: null, err };
     }
-  }
-
-  #connect = (conn) => new Promise((resolve) => {
-    conn.connect((err) => {
-      if (err) return resolve(err);
-      resolve(err);
-    });
-  });
+  } 
 
   async getConnection() {
     const res = Object.create({conn: null, err: null});
@@ -89,6 +85,12 @@ class ConnectionController {
     }
     res.conn = conn;
     return res;
+  }
+
+  async createPool(options) {
+    const pool = new ConnectionPool(this.connObj, this.options.driverName, options);
+    await pool.init();
+    return pool;
   }
 
 }
