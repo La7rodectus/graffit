@@ -1,7 +1,7 @@
 const Procedures = require('./db_structs/procedures.js');
-const ConnectionsController = require('./connectionsController.js').default;
+const ConnectionsController = require('./connectionsController/connectionsController.js').default;
 const DatabaseDataValidator = require('./dataValidator.js').default;
-const SqlTable = require('./db_structs/sqlTable.js').SqlTable;
+const SqlTable = require('./db_structs/sqlTable.js').default;
 
 const defaultOptions = {
   Dbdv: DatabaseDataValidator,
@@ -9,33 +9,22 @@ const defaultOptions = {
 
 //data base controller
 class DBC {
+  #conn = undefined;
+
   constructor(conn_obj, options = {}) {
-    this._conn = null;
-    this.options = { ...defaultOptions, ...options };
     this.dbdv = options.Dbdv;                            // DatabaseDataValidator
     this.cc = new ConnectionsController(conn_obj);       // ConnectionController
-    this.schema = null;
-  }
+    this.options = { ...defaultOptions, ...options };
+    this.schema = undefined;
 
-  connect = (cb) => new Promise((resolve, reject) => {
-    this.cc.getConnection().then((res) => {
-      if (res.err) return resolve(res.err);
-      this._conn = res.conn;
-      if (cb) cb();
-      resolve();
-    });
-  });
-
-  connDestroy() {
-    this._conn.destroy();
-    this._conn = null;
   }
 
   init = (dbSchema) => new Promise(async (resolve, reject) => {
     try {
-      if (!this._conn) {
-        const err = await this.connect();
+      if (!this.#conn) {
+        const {conn, err} = await this.getConnection();
         if (err) throw err;
+        this.#conn = conn;
       }
       const schema = dbSchema ? dbSchema : await this.queryDbSchema();
       this.schema = schema;
@@ -61,12 +50,12 @@ class DBC {
         name: null,
         tables: {},
       };
-      const data = await Procedures.getBaseTableNames(this._conn);
+      const data = await Procedures.getBaseTableNames(this.#conn);
       const tableNames = [];
       for (const row of data) tableNames.push(row['table_name']);
       const promises = [];
       for (const tName of tableNames) {
-        promises.push(Procedures.descTable(this._conn, tName));
+        promises.push(Procedures.descTable(this.#conn, tName));
       }
       Promise.all(promises).then((data) => {
         if (data.length === 0) throw new Error('Empty Tables!');

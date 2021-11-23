@@ -29,9 +29,10 @@ class QueryBuilder {
     if (err) return {conn, err};
     return new Promise((resolve, reject) => {
       conn.query(query, (err, result) => {
+        conn.release();
         if (err) reject(err);
         else resolve(result);
-      });
+      });      
     });
   }
 
@@ -47,14 +48,35 @@ class QueryBuilder {
     return fullQuery;
   }
 
-  orderBy(field) {
-    const expressionName = 'orderBy';
+  editSchema(expressionName, query) {
+    this.#schema[this.findIndexBySchemaField(expressionName)][expressionName] = query;
+  }
+
+  where(field) {
+    const expressionName = 'where';
     if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
-    this.#schema[this.findIndexBySchemaField(expressionName)][expressionName] = `ORDER BY ${field}`;
+    const queryBuilder = this;
+    let query = `WHERE ${field} `;
+    return { 
+      equals: (value) => {
+        query += `= ${value}`;
+        queryBuilder.editSchema(expressionName, query);
+        return queryBuilder;
+      },
+    }
+  }
+
+  orderBy(field, order = 'ASC') {
+    const expressionName = 'orderBy';
+    if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"!');
+    if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    this.editSchema(expressionName, `ORDER BY ${field} ${order}`);
     return this;
   }
 
-  innerJoin() {
+  innerJoin(tableName, joinBy) {
+    const expressionName = 'innerJoin';
+    const query = `INNER JOIN ${tableName} AS tN ON `
 
   }
 }

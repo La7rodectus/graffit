@@ -57,7 +57,7 @@ class SqlTable extends TableInstance {
     return await this.executeQuery(query);
   }
 
-  async insertByPK(object) {
+  async insert(object) {
     const wrappedObject = wrapObjectFields(object);
     const values = Object.values(wrappedObject).join(', ');
     const fields = Object.keys(wrappedObject).join(', ');
@@ -75,4 +75,4 @@ class SqlTable extends TableInstance {
 
 };
 
-module.exports = { SqlTable };
+module.exports.default = SqlTable;

@@ -1,14 +1,10 @@
 const Graffit = require('./src/graffit.js').default;
 
 const connObj = {
-  // host: 'sql4.freemysqlhosting.net',
-  // user: 'sql4448941',
-  // password: 'cPG4z3wKKX',
-  // database: 'sql4448941'
   "host": "sql11.freemysqlhosting.net",
   "user": "sql11452212",
   "password": "W7lHHlYBFS",
-  "database": "sql11452212"
+  "database": "sql11452212",
 };
 
 console.log('Example start');
@@ -18,10 +14,12 @@ console.log('Example start');
   try {
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
-    await dbc.connDestroy();
     if (err) return console.log('const error connect:', err);
-    res = await dbc.flights.get('flight_name', 'flight_date').orderBy('flight_name').do(); //.orderBy().do();
-    await dbc.connDestroy();
+    res = await dbc.flights.get()
+                           .orderBy('flight_name', 'DESC')
+                           .where('ticket_price')
+                           .equals(3000)
+                           .do(); //.orderBy().do();
   } catch (err) {
     console.log('catch error:', err);
   }
