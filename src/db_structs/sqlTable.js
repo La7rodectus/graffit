@@ -1,5 +1,6 @@
 const { wrapString, wrapObjectFields } = require('../../helpers.js');
 const TableInstance = require('./tableInstance.interface.js').default;
+const QueryBuilder = require('./queryBuilder.js').QueryBuilder;
 
 class SqlTable extends TableInstance {
   constructor(connProvider, tableData) {
@@ -13,14 +14,11 @@ class SqlTable extends TableInstance {
 
   //check after
   async executeQuery(query) {
-    const {conn, err} = await this.connProvider.getConnection();
-    if (err) return {conn, err};
-    return new Promise((resolve, reject) => {
-      conn.query(query, (err, script) => {
-        if (err) reject(err);
-        else resolve(script);
-      });
-    });
+    
+  }
+
+  createQueryBuilder(firstQuery) {
+    return new QueryBuilder(firstQuery, this.connProvider, this);
   }
 
   async getByPK(pk) {
@@ -31,9 +29,10 @@ class SqlTable extends TableInstance {
     return await this.executeQuery(query);
   }
 
-  async getAll() {
-    const query = `SELECT * FROM ${this.name}`;
-    return await this.executeQuery(query);
+  get(...fields) {
+    if (!Array.isArray(fields) || fields.length === 0) fields = ['*'];
+    const query = `SELECT ${fields.join(', ')} FROM ${this.name}`;
+    return this.createQueryBuilder(query);
   }
 
   async deleteByPK(pk) {
@@ -68,6 +67,10 @@ class SqlTable extends TableInstance {
     const query = `INSERT INTO ${this.name} ( ${fields} )
                    VALUES ( ${values} );`;
     return await this.executeQuery(query);
+  }
+
+  async orderBy(field) {
+    
   }
 
 };

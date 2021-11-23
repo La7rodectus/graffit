@@ -15,8 +15,11 @@ console.log('Example start');
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
-    // res = await dbc.flights.getAll();
-    //for (let i = 0; i < 2; i++) dbc.flights.getAll();
+    res = await dbc.flights.get()
+                           .orderBy('flight_name', 'DESC')
+                           .where('ticket_price')
+                           .equals(3000)
+                           .do(); //.orderBy().do();
   } catch (err) {
     console.log('catch error:', err);
   }
