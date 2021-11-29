@@ -9,8 +9,6 @@ const defaultOptions = {
 
 //data base controller
 class DBC {
-  #conn = undefined;
-
   constructor(conn_obj, options = {}) {
     this.dbdv = options.Dbdv;                            // DatabaseDataValidator
     this.cc = new ConnectionsController(conn_obj);       // ConnectionController
@@ -21,11 +19,6 @@ class DBC {
 
   init = (dbSchema) => new Promise(async (resolve, reject) => {
     try {
-      if (!this.#conn) {
-        const {conn, err} = await this.getConnection();
-        if (err) throw err;
-        this.#conn = conn;
-      }
       const schema = dbSchema ? dbSchema : await this.queryDbSchema();
       this.schema = schema;
       this.dbdv = new this.options.Dbdv(this.schema);
@@ -46,16 +39,18 @@ class DBC {
   // creates object from db schema
   queryDbSchema = () => new Promise(async (resolve, reject) => {
     try {
+      const {conn, err} = await this.getConnection();
+      if (err) throw err;
       const schema = {
         name: null,
         tables: {},
       };
-      const data = await Procedures.getBaseTableNames(this.#conn);
+      const data = await Procedures.getBaseTableNames(conn);
       const tableNames = [];
       for (const row of data) tableNames.push(row['table_name']);
       const promises = [];
       for (const tName of tableNames) {
-        promises.push(Procedures.descTable(this.#conn, tName));
+        promises.push(Procedures.descTable(conn, tName));
       }
       Promise.all(promises).then((data) => {
         if (data.length === 0) throw new Error('Empty Tables!');
@@ -80,19 +75,10 @@ class DBC {
       });
     } catch (err) {
       reject(err);
+    } finally {
+      conn.release();
     }
   });
-
-  // insertBank = (updateObj) => Procedures.insertIntoTable(this._conn, 'Banks', updateObj);
-
-  // updateBankByName = (name, updateObj) => Procedures.updateTable(this._conn, 'Banks', 'bankName', name, updateObj);
-
-  // deleteFromBankByName = (name) => Procedures.deleteRowsFromTable(this._conn, 'Banks', 'bankName', name);
-
-  // getAllBanks = () => Procedures.getAllFromTable(this._conn, 'Banks');
-
-  // getBankByName = (name) => Procedures.getFromTableBy(this._conn, 'Banks', 'bankName', name);
-
 }
 
 module.exports.default = DBC;
