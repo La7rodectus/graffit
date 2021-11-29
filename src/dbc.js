@@ -38,8 +38,10 @@ class DBC {
 
   // creates object from db schema
   queryDbSchema = () => new Promise(async (resolve, reject) => {
+    let getConnRes = Object.create(null);
     try {
-      const {conn, err} = await this.getConnection();
+      getConnRes = await this.getConnection();
+      const {conn, err} = getConnRes;
       if (err) throw err;
       const schema = {
         name: null,
@@ -76,7 +78,7 @@ class DBC {
     } catch (err) {
       reject(err);
     } finally {
-      conn.release();
+      if (getConnRes.conn) getConnRes.conn.release();
     }
   });
 }

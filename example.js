@@ -2,9 +2,9 @@ const Graffit = require('./src/graffit.js').default;
 
 const connObj = {
   "host": "sql11.freemysqlhosting.net",
-  "user": "sql11452212",
-  "password": "W7lHHlYBFS",
-  "database": "sql11452212",
+  "user": "sql11454908",
+  "password": "ghkhHRPw8z",
+  "database": "sql11454908",
 };
 
 console.log('Example start');
