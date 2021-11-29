@@ -56,19 +56,75 @@ class QueryBuilder {
     const expressionName = 'where';
     if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
     const queryBuilder = this;
-    let query = `WHERE ${field} `;
-    return { 
-      equals: (value) => {
-        query += `= ${value}`;
+    let query = `WHERE `;
+    const whereSelectors = {
+      and() {
+        query += ` AND `;
+        return this;
+      },
+      or() {
+        query += ` OR `;
+        return this;
+      },
+      existsIn(vals, cmpField = field) {
+        query += `${cmpField} IN (${vals.join(', ')})`;
+        return this;
+      },
+      isNull(cmpField = field) {
+        query += `${cmpField} IS NULL`;
+        return this;
+      },
+      equals(value, cmpField = field) {
+        query += `${cmpField} = ${value}`;
+        return this;
+      },
+      like(likePattern, cmpField = field) {
+        query += `${cmpField} LIKE ${likePattern}`;
+        return this;
+      },
+      notEquals(value, cmpField = field) {
+        query += `${cmpField} <> ${value}`;
+        return this;
+      },
+      less(value, cmpField = field, equalsBool = false) {
+        if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
+        let eq = '';
+        if (equalsBool) eq += '=';
+        query += `${cmpField} <${eq} ${value}`;
+        return this;
+      },
+      more(value, cmpField = field, equalsBool = false) {
+        if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
+        let eq = '';
+        if (equalsBool) eq += '=';
+        query += `${cmpField} >${eq} ${value}`;
+        return this;
+      },
+      between(value1, value2, cmpField = field) {
+        if (typeof value1 !== 'number') throw new Error(`Value ${value1} should be of type number`);
+        if (typeof value2 !== 'number') throw new Error(`Value ${value2} should be of type number`);
+        query += `${cmpField} BETWEEN ${value1} AND ${value2}`;
+        return this;
+      },
+      startExpression() {
+        query += `(`;
+        return this;
+      },
+      endExpression() {
+        query += `)`;
+        return this;
+      },
+      endWhere() {
         queryBuilder.editSchema(expressionName, query);
         return queryBuilder;
-      },
+      }
     }
+    return whereSelectors;
   }
 
   orderBy(field, order = 'ASC') {
     const expressionName = 'orderBy';
-    if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"!');
+    if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
     if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
     this.editSchema(expressionName, `ORDER BY ${field} ${order}`);
     return this;

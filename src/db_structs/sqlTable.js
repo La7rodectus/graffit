@@ -26,10 +26,10 @@ class SqlTable extends TableInstance {
     const query = `SELECT * 
                    FROM ${this.name} 
                    WHERE ${this.PK} = ${wrappedPk};`;
-    return await this.executeQuery(query);
+    return this.createQueryBuilder(query).do();
   }
 
-  get(...fields) {
+  select(...fields) {
     if (!Array.isArray(fields) || fields.length === 0) fields = ['*'];
     const query = `SELECT ${fields.join(', ')} FROM ${this.name}`;
     return this.createQueryBuilder(query);

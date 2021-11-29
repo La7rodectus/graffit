@@ -73,12 +73,11 @@ class DBC {
           tableData.name = tableNames[i];
           this[tableNames[i]] = new SqlTable(this, tableData);
         }
+        getConnRes.conn.release();
         resolve(schema);
       });
     } catch (err) {
       reject(err);
-    } finally {
-      if (getConnRes.conn) getConnRes.conn.release();
     }
   });
 }
