@@ -1,8 +1,0 @@
-
-class Column {
-  constructor(rowData) {
-    
-  }
-
-}
- 

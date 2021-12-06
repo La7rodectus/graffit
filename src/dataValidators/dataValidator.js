@@ -6,9 +6,10 @@ const TYPES_MODEL = {
 };
 
 
-module.exports.default = class DatabaseDataValidator {
+class DatabaseDataValidator {
   constructor(schema) {
     this.validationSchema = this._parseSchema(schema);
+    this.TYPES = TYPES_MODEL;
   }
 
   _parseSchema(inputSchema) {
@@ -29,14 +30,14 @@ module.exports.default = class DatabaseDataValidator {
   }
 
   _createValidationFunc(type) {
-    const jsType = TYPES_MODEL[type[0]];
-    const maxLen = +type[1];
+    const jsType = this.TYPES[type[0]];
+    const maxLen = +type[1] || this.TYPES[type[0]];
     return (val) => {
-      console.log('val:', val)
-      console.log('valLen:', Number.valueOf(val).length)
+      console.log('val:', val);
+      console.log('valLen:', Number.valueOf(val).length);
       if (typeof val !== jsType) return false;
-      if (jsType === 'string' && val.length > maxLen) return false;
-      if (jsType === 'number' && Number.valueOf(val).length > maxLen) return false;
+      else if (jsType === 'string' && val.length > maxLen) return false;
+      else if (jsType === 'number' && Number.valueOf(val).length > maxLen) return false;
       return true;
     };
   }
@@ -44,3 +45,5 @@ module.exports.default = class DatabaseDataValidator {
   validate = (tableName, field, val) => this.validationSchema.tables[tableName][field](val);
 
 }
+
+module.exports = DatabaseDataValidator;

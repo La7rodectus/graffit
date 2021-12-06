@@ -1,7 +1,7 @@
 const process = require('process');
 const EventEmitter = require('events');
-const ConnectionService = require('./connectionService.js').default;
-const ConnectionPool = require('./connectionPool.js').default;
+const ConnectionService = require('./connectionService.js');
+const ConnectionPool = require('./connectionPool.js');
 
 const defaultOptions = {
   maxConn: 5,
@@ -51,7 +51,6 @@ class ConnectionController {
 
   #destroyConn(conn) {
     console.log(`destroy connection called on threadId: ${conn.threadId}`);
-    this.#unregisterConn(conn);
     conn.destroy();
   }
 
@@ -95,4 +94,4 @@ class ConnectionController {
 
 }
 
-module.exports.default = ConnectionController;
+module.exports = ConnectionController;

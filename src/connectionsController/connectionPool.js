@@ -1,4 +1,4 @@
-const ConnectionService = require('./connectionService.js').default;
+const ConnectionService = require('./connectionService.js');
 const EventEmitter = require('events');
 
 const defaultOptions = {
@@ -82,4 +82,4 @@ class ConnectionPool {
 
 }
 
-module.exports.default = ConnectionPool;
+module.exports = ConnectionPool;

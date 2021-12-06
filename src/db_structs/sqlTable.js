@@ -1,14 +1,15 @@
 const { wrapString, wrapObjectFields } = require('../../helpers.js');
-const TableInstance = require('./tableInstance.interface.js').default;
-const QueryBuilder = require('./queryBuilder.js').QueryBuilder;
+const DatabaseDataValidator = require('../dataValidators/dataValidator.js');
+const QueryBuilder = require('./queryBuilder.js');
 
-class SqlTable extends TableInstance {
+//TODO: rewrite usage of PK type String to []String
+
+class SqlTable {
   constructor(connProvider, tableData) {
-    super();
     this.connProvider = connProvider;
     this.name = tableData.name;
     this.fields = tableData.fields;
-    this.PK = tableData.PK;  // name String
+    this.PK = tableData.PK;  //[name String, name String ...] 
     this.FK = tableData.FK;  //[name String, name String ...]
   }
 
@@ -75,4 +76,4 @@ class SqlTable extends TableInstance {
 
 };
 
-module.exports.default = SqlTable;
+module.exports = SqlTable;

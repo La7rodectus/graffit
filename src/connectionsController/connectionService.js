@@ -25,4 +25,4 @@ class ConnectionService  {
 
 }
 
-module.exports.default = ConnectionService;
+module.exports = ConnectionService;
