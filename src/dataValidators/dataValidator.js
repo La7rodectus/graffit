@@ -1,18 +1,27 @@
-const TYPES_MODEL = {
-  int: 'number',
-  varchar: 'string',
-  char: 'string',
+const validators = require('./baseValidators.js');
 
+const DEFAULT_VALIDATORS_CREATORS = {
+  int: [validators.createIntBaseValidator],
+  varchar: [validators.createStringBaseValidator],
+  char: [validators.createStringBaseValidator],
 };
-
 
 class DatabaseDataValidator {
   constructor(schema) {
-    this.validationSchema = this._parseSchema(schema);
-    this.TYPES = TYPES_MODEL;
+    this.validationSchema = this.#parseSchema(schema);
   }
 
-  _parseSchema(inputSchema) {
+  validate = (tableName, field, val) => this.#callValidators(tableName, field, val);
+
+  #callValidators(tableName, field, val) {
+    const validators = this.validationSchema.tables[tableName][field];
+    for (const validator of validators) {
+      if (!validator(val)) return false;
+    }
+    return true;
+  }
+
+  #parseSchema(inputSchema) {
     const schema = JSON.parse(JSON.stringify(inputSchema));
     const tables = schema.tables;
     for (const tableName in tables) {
@@ -20,29 +29,20 @@ class DatabaseDataValidator {
       const tableValidator = {};
       const tableFields = table.fields;
       for (const field in tableFields) {
-        let type = tableFields[field];
-        type = type.substr(0, type.length - 1).split('(');
-        tableValidator[field] = this._createValidationFunc(type);
+        let rowType = tableFields[field];
+        tableValidator[field] = this.#createValidationFunc(rowType);
       }
       schema.tables[tableName] = tableValidator;
     }
     return schema;
   }
 
-  _createValidationFunc(type) {
-    const jsType = this.TYPES[type[0]];
-    const maxLen = +type[1] || this.TYPES[type[0]];
-    return (val) => {
-      console.log('val:', val);
-      console.log('valLen:', Number.valueOf(val).length);
-      if (typeof val !== jsType) return false;
-      else if (jsType === 'string' && val.length > maxLen) return false;
-      else if (jsType === 'number' && Number.valueOf(val).length > maxLen) return false;
-      return true;
-    };
+  #createValidationFunc(rowType) {
+    const typeRegEx = /^[a-zA-Z]+/g;
+    const [type] = rowType.match(typeRegEx);
+    const creators = DEFAULT_VALIDATORS_CREATORS[type];
+    return creators.map((creator => creator(rowType)));
   }
-
-  validate = (tableName, field, val) => this.validationSchema.tables[tableName][field](val);
 
 }
 
