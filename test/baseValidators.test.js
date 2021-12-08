@@ -44,6 +44,22 @@ describe('BaseValidators', () => {
         const res = f('12');
         assert.strictEqual(res, false);
       });
+      it('Validation undefined should be false', () => {
+        const res = f(undefined);
+        assert.strictEqual(res, false);
+      });
+      it('Validation NaN should be false', () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
+      it('Validation Infinity should be false', () => {
+        const res = f(Infinity);
+        assert.strictEqual(res, false);
+      });
+      it('Validation {} should be false', () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
     });
 
 
@@ -77,6 +93,102 @@ describe('BaseValidators', () => {
       it('Validation -111.0 should be true', () => {
         const res = f(-111.0);
         assert.strictEqual(res, true);
+      });
+      it('Validation undefined should be true', () => {
+        const res = f(undefined);
+        assert.strictEqual(res, true);
+      });
+      it('Validation NaN should be false', () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
+      it('Validation Infinity should be false', () => {
+        const res = f(Infinity);
+        assert.strictEqual(res, false);
+      });
+      it('Validation {} should be false', () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
+    });
+  });
+  describe('createStringBaseValidator()', () => {
+    describe('Create for char(3)', () => {
+      const f = baseValidators.createStringBaseValidator('char(3)');
+      it(`Validation '' should be true`, () => {
+        const res = f('');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation ' ' should be true`, () => {
+        const res = f(' ');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '   ' should be true`, () => {
+        const res = f('   ');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation 'abc' should be true`, () => {
+        const res = f('abc');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation 'abcd' should be false`, () => {
+        const res = f('abcd');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation null should be false`, () => {
+        const res = f(null);
+        assert.strictEqual(res, false);
+      });
+      it(`Validation undefined should be false`, () => {
+        const res = f(undefined);
+        assert.strictEqual(res, false);
+      });
+      it(`Validation {} should be false`, () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
+      it(`Validation NaN should be false`, () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
+    });
+    describe('Create for char(3)|null', () => {
+      const f = baseValidators.createStringBaseValidator('char(3)|null');
+      it(`Validation '' should be true`, () => {
+        const res = f('');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation ' ' should be true`, () => {
+        const res = f(' ');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '   ' should be true`, () => {
+        const res = f('   ');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation 'abc' should be true`, () => {
+        const res = f('abc');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation 'abcd' should be false`, () => {
+        const res = f('abcd');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation null should be true`, () => {
+        const res = f(null);
+        assert.strictEqual(res, true);
+      });
+      it(`Validation undefined should be true`, () => {
+        const res = f(undefined);
+        assert.strictEqual(res, true);
+      });
+      it(`Validation {} should be false`, () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
+      it(`Validation NaN should be false`, () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
       });
     });
   });

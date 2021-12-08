@@ -8,7 +8,7 @@ function createIntBaseValidator(typeString) {
   let [type, len] = sqlType.slice(0, -1).split('(');
   len = +len;
   return (val = null) => {
-    if (!val && val !== 0) {
+    if (!val && val !== 0 && !Number.isNaN(val)) {
       if (isNull) return true;
       else return false;
     }
@@ -23,7 +23,7 @@ function createStringBaseValidator(typeString) {
   let [type, len] = sqlType.slice(0, -1).split('(');
   len = +len;
   return (val = null) => {
-    if (!val) {
+    if (!val && val !== '' && !Number.isNaN(val)) {
       if (isNull) return true;
       else return false;
     }
