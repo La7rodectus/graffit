@@ -15,18 +15,18 @@ console.log('Example start');
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
-    // res = await dbc.flights.select()
-    //                        .orderBy('flight_name', 'DESC')
-    //                        .where('ticket_price')
-    //                        .existsIn([13, 88, 67, 3000, 129])
-    //                        .and()
-    //                        .startExpression()
-    //                        .more(4, 'flight_id')
-    //                        .or()
-    //                        .less(2, 'flight_id')
-    //                        .endExpression()
-    //                        .endWhere()
-    //                        .do();
+    res = await dbc.Persons.select().do()
+                          //  .orderBy('flight_name', 'DESC')
+                          //  .where('ticket_price')
+                          //  .existsIn([13, 88, 67, 3000, 129])
+                          //  .and()
+                          //  .startExpression()
+                          //  .more(4, 'flight_id')
+                          //  .or()
+                          //  .less(2, 'flight_id')
+                          //  .endExpression()
+                          //  .endWhere()
+                          //  .do();
   } catch (err) {
     console.log('catch error:', err);
   }

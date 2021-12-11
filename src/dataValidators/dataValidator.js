@@ -13,6 +13,10 @@ class DatabaseDataValidator {
 
   validate = (tableName, field, val) => this.#callValidators(tableName, field, val);
 
+  addValidator(table, field, ...validators) {
+    this.validationSchema.tables[table][field].contact(validators);
+  }
+
   #callValidators(tableName, field, val) {
     const validators = this.validationSchema.tables[tableName][field];
     for (const validator of validators) {

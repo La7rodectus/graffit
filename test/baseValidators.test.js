@@ -112,6 +112,7 @@ describe('BaseValidators', () => {
       });
     });
   });
+
   describe('createStringBaseValidator()', () => {
     describe('Create for char(3)', () => {
       const f = baseValidators.createStringBaseValidator('char(3)');
@@ -152,6 +153,7 @@ describe('BaseValidators', () => {
         assert.strictEqual(res, false);
       });
     });
+
     describe('Create for char(3)|null', () => {
       const f = baseValidators.createStringBaseValidator('char(3)|null');
       it(`Validation '' should be true`, () => {
@@ -188,6 +190,20 @@ describe('BaseValidators', () => {
       });
       it(`Validation NaN should be false`, () => {
         const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
+    });
+  });
+
+  describe('createDateBaseValidator()', () => {
+    describe('Create for date', () => {
+      const f = baseValidators.createDateBaseValidator('date');
+      it(`Validation '2001-10-21' should be true`, () => {
+        const res = f('2001-10-21');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '2001-10' should be false`, () => {
+        const res = f('2001-10');
         assert.strictEqual(res, false);
       });
     });
