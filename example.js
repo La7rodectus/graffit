@@ -1,10 +1,17 @@
 const Graffit = require('./src/graffit.js');
 
+// const connObj = {
+//   "host": "sql11.freemysqlhosting.net",
+//   "user": "sql11456793",
+//   "password": "isiDi4EVFN",
+//   "database": "sql11456793",
+// };
+
 const connObj = {
-  "host": "sql11.freemysqlhosting.net",
-  "user": "sql11456793",
-  "password": "isiDi4EVFN",
-  "database": "sql11456793",
+  "host": "localhost",
+  "user": "liza",
+  "password": "#Cactuz555",
+  "database": "web_aviatickets",
 };
 
 console.log('Example start');
@@ -15,18 +22,15 @@ console.log('Example start');
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
-    // res = await dbc.flights.select()
-    //                        .orderBy('flight_name', 'DESC')
-    //                        .where('ticket_price')
-    //                        .existsIn([13, 88, 67, 3000, 129])
-    //                        .and()
-    //                        .startExpression()
-    //                        .more(4, 'flight_id')
-    //                        .or()
-    //                        .less(2, 'flight_id')
-    //                        .endExpression()
-    //                        .endWhere()
-    //                        .do();
+    res = await dbc.flights.select('flight_id', 'flight_name')
+                          //  .orderBy('flight_name', 'DESC')
+                          //  .where('flight_id')
+                          //  .more(4)
+                          //  .and()
+                          //  .less(2)
+                          //  .endWhere()
+                          //  .innerJoin(dbc.places, 'from_place', 'place_id')
+                          .do();
   } catch (err) {
     console.log('catch error:', err);
   }

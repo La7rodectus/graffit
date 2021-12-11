@@ -6,7 +6,7 @@ class MySqlSchemaParser extends BaseSchemaParser {
   }
 
   _getBaseTableNames(conn) {
-    const q = `SELECT table_name FROM information_schema.tables WHERE table_type = 'base table'`;
+    const q = `SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'`;
     return this._exec(q, conn);
   }
 

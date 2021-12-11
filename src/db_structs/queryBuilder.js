@@ -117,7 +117,7 @@ class QueryBuilder {
       endWhere() {
         queryBuilder.editSchema(expressionName, query);
         return queryBuilder;
-      }
+      },
     }
     return whereSelectors;
   }
@@ -130,10 +130,11 @@ class QueryBuilder {
     return this;
   }
 
-  innerJoin(tableName, joinBy) {
+  innerJoin(table, key1, key2) {
     const expressionName = 'innerJoin';
-    const query = `INNER JOIN ${tableName} AS tN ON `
-
+    const query = `INNER JOIN ${table.name} ON ${table.name}.${key2} = ${this.#table.name}.${key1}`;
+    this.editSchema(expressionName, query);
+    return this;
   }
 }
 

@@ -30,7 +30,7 @@ class DBC {
       this.schema = dbSchema ? dbSchema : await this.parser.queryDbSchema(conn);
       conn.release();
       this.#assignSchema(this.schema);
-      this.dbdv = new this.dbdv(this.schema);
+      // this.dbdv = new this.dbdv(this.schema);
     } catch (err) {
       return err;
     }

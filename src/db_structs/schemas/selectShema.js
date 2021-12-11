@@ -1,8 +1,8 @@
 function SelectSchema() {
   return [
     {select: ''},
-    {where: ''},
     {innerJoin: ''},
+    {where: ''},
     {groupBy: ''},
     {orderBy: ''},
     {limit: ''},
