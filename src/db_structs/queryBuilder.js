@@ -1,3 +1,4 @@
+const UniqueStringsGenerator = require('../util/UniqueStringsGenerator').UniqueStringsGenerator;
 const SelectSchema = require('./schemas/selectShema.js').SelectSchema;
 const schemas = {
   'select': SelectSchema,
@@ -7,13 +8,20 @@ class QueryBuilder {
   #connProvider;
   #table;
   #schema;
+  #alias;
+  #aliases;
+  #stringsGenerator;
   constructor(firstQuery, connProvider, table) {
-    const queryType = firstQuery.split(' ')[0].toLowerCase();
-    this.#schema = schemas[queryType]();
-    const startQueryIndex = this.findIndexBySchemaField(queryType);
-    this.#schema[startQueryIndex][queryType] = firstQuery;
+    for (let queryType in firstQuery) {
+      if (schemas.hasOwnProperty(queryType)) this.#schema = schemas[queryType]();
+      const startQueryIndex = this.findIndexBySchemaField(queryType);
+      this.#schema[startQueryIndex][queryType] = firstQuery[queryType];
+    }
     this.#connProvider = connProvider;
     this.#table = table;
+    this.#alias = this.#table.alias;
+    this.#aliases = {};
+    this.#stringsGenerator = new UniqueStringsGenerator(this.#aliases);
   }
 
   findIndexBySchemaField(field) {
@@ -28,7 +36,7 @@ class QueryBuilder {
     const {conn, err} = await this.#connProvider.getConnection();
     if (err) return {conn, err};
     return new Promise((resolve, reject) => {
-      conn.query(query, (err, result) => {
+      conn.query({sql: query, nestTables: '_' }, (err, result) => {
         conn.release();
         if (err) reject(err);
         else resolve(result);
@@ -67,43 +75,43 @@ class QueryBuilder {
         return this;
       },
       existsIn(vals, cmpField = field) {
-        query += `${cmpField} IN (${vals.join(', ')})`;
+        query += `${queryBuilder.#alias}.${cmpField} IN (${vals.join(', ')})`;
         return this;
       },
       isNull(cmpField = field) {
-        query += `${cmpField} IS NULL`;
+        query += `${queryBuilder.#alias}.${cmpField} IS NULL`;
         return this;
       },
       equals(value, cmpField = field) {
-        query += `${cmpField} = ${value}`;
+        query += `${queryBuilder.#alias}.${cmpField} = ${value}`;
         return this;
       },
       like(likePattern, cmpField = field) {
-        query += `${cmpField} LIKE ${likePattern}`;
+        query += `${queryBuilder.#alias}.${cmpField} LIKE ${likePattern}`;
         return this;
       },
       notEquals(value, cmpField = field) {
-        query += `${cmpField} <> ${value}`;
+        query += `${queryBuilder.#alias}.${cmpField} <> ${value}`;
         return this;
       },
       less(value, cmpField = field, equalsBool = false) {
         if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
         let eq = '';
         if (equalsBool) eq += '=';
-        query += `${cmpField} <${eq} ${value}`;
+        query += `${queryBuilder.#alias}.${cmpField} <${eq} ${value}`;
         return this;
       },
       more(value, cmpField = field, equalsBool = false) {
         if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
         let eq = '';
         if (equalsBool) eq += '=';
-        query += `${cmpField} >${eq} ${value}`;
+        query += `${queryBuilder.#alias}.${cmpField} >${eq} ${value}`;
         return this;
       },
       between(value1, value2, cmpField = field) {
         if (typeof value1 !== 'number') throw new Error(`Value ${value1} should be of type number`);
         if (typeof value2 !== 'number') throw new Error(`Value ${value2} should be of type number`);
-        query += `${cmpField} BETWEEN ${value1} AND ${value2}`;
+        query += `${queryBuilder.#alias}.${cmpField} BETWEEN ${value1} AND ${value2}`;
         return this;
       },
       startExpression() {
@@ -126,15 +134,34 @@ class QueryBuilder {
     const expressionName = 'orderBy';
     if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
     if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
-    this.editSchema(expressionName, `ORDER BY ${field} ${order}`);
+    this.editSchema(expressionName, `ORDER BY ${this.#alias}.${field} ${order}`);
     return this;
   }
 
-  innerJoin(table, key1, key2) {
+  join(table, key1 = null, key2 = null) {
+    const tableName = table.name;
+    let keys1 = null;
+    if (key1 === null && key2 === null) {
+      keys1 = this.#table.FK;
+      key2 = table.PK;
+    } else {
+      keys1 = [key1];
+    }
+    console.log(keys1, key2); // here
     const expressionName = 'innerJoin';
-    const query = `INNER JOIN ${table.name} ON ${table.name}.${key2} = ${this.#table.name}.${key1}`;
+    let query = '';
+    for (let key of keys1) {
+      query += this.innerJoinQuery(tableName, key, key2);
+    }
     this.editSchema(expressionName, query);
+    //this.appendToSelect(tableName);
     return this;
+  }
+
+  innerJoinQuery(tableName, key1, key2) {
+    if (!this.#aliases.hasOwnProperty(tableName + key1)) this.#stringsGenerator.generateUniqueString(tableName, key1);
+    const alias = this.#aliases[tableName + key1];
+    return `INNER JOIN ${tableName} ${alias} ON ${alias}.${key2} = ${this.#alias}.${key1} `;
   }
 }
 

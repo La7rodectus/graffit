@@ -1,6 +1,7 @@
 function SelectSchema() {
   return [
     {select: ''},
+    {from: ''},
     {innerJoin: ''},
     {where: ''},
     {groupBy: ''},
