@@ -1,4 +1,4 @@
-const { Range } = require('../utils.js');
+const { Range } = require('../utils/utils.js');
 const { isNullNum, isNullStr } = require('./helpers.js');
 
 const MYSQL_CONFIG = {

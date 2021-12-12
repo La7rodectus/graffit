@@ -11,4 +11,4 @@ function SelectSchema() {
   ];
 }
 
-module.exports = { SelectSchema };
+module.exports = SelectSchema;

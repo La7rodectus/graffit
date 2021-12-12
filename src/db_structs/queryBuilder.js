@@ -1,4 +1,4 @@
-const UniqueStringsGenerator = require('../util/UniqueStringsGenerator');
+const UniqueStringsGenerator = require('../utils/uniqueStringsGenerator');
 const SelectSchema = require('./schemas/selectSchema.js');
 
 const schemas = {

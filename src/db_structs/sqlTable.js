@@ -1,4 +1,4 @@
-const { wrapString, wrapObjectFields, replaceAt } = require('../../helpers.js');
+const { wrapString, wrapObjectFields, replaceAt } = require('../utils/helpers.js');
 // const DatabaseDataValidator = require('../dataValidators/dataValidator.js');
 const QueryBuilder = require('./queryBuilder.js');
 
