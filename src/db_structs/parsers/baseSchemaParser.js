@@ -19,8 +19,9 @@ class BaseSchemaParser {
     try {
       const schema = new Schema();
       const data = await this._getBaseTableNames(conn);
+      console.log(data);
       const tableNames = [];
-      for (const row of data) tableNames.push(row['table_name']);
+      for (const row of data) tableNames.push(row['TABLE_NAME']);
       const promises = [];
       for (const tName of tableNames) {
         promises.push(this._descTable(conn, tName));

@@ -11,11 +11,7 @@ class SqlTable {
     this.fields = tableData.fields;
     this.PK = tableData.PK;  //[name String, name String ...]
     this.FK = tableData.FK;  //[name String, name String ...]
-  }
-
-  //check after
-  async executeQuery(query) {
-
+    this.alias = this.name.slice(0, 1);
   }
 
   createQueryBuilder(firstQuery) {
@@ -24,15 +20,16 @@ class SqlTable {
 
   async getByPK(pk) {
     const wrappedPk = wrapString(pk);
-    const query = `SELECT * 
+    const query = `SELECT ${this.name}.* 
                    FROM ${this.name} 
                    WHERE ${this.PK} = ${wrappedPk};`;
     return this.createQueryBuilder(query).do();
   }
 
   select(...fields) {
-    if (!Array.isArray(fields) || fields.length === 0) fields = ['*'];
-    const query = `SELECT ${fields.join(', ')} FROM ${this.name}`;
+    if (!Array.isArray(fields) || fields.length === 0) fields = [`*`];
+    const query = { select: `SELECT ${fields.join(', ')}`,
+      from: `FROM ${this.name} ${this.alias}` };
     return this.createQueryBuilder(query);
   }
 
@@ -68,10 +65,6 @@ class SqlTable {
     const query = `INSERT INTO ${this.name} ( ${fields} )
                    VALUES ( ${values} );`;
     return this.executeQuery(query);
-  }
-
-  async orderBy(field) {
-
   }
 
 }

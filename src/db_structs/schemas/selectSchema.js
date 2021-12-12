@@ -2,8 +2,9 @@
 function SelectSchema() {
   return [
     { select: '' },
-    { where: '' },
+    { from: '' },
     { innerJoin: '' },
+    { where: '' },
     { groupBy: '' },
     { orderBy: '' },
     { limit: '' },
