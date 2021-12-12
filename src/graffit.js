@@ -1,6 +1,5 @@
 const DBC = require('./dbc.js');
-
-const SUPPORTED_DRIVERS = ['mysql'];
+const { SUPPORTED_DRIVERS } = require('./config.js');
 
 class Graffit {
   constructor() {}

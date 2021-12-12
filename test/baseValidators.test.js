@@ -206,6 +206,22 @@ describe('BaseValidators', () => {
         const res = f('2001-10');
         assert.strictEqual(res, false);
       });
+      it(`Validation '2001-1' should be false`, () => {
+        const res = f('2001-1');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-10-' should be false`, () => {
+        const res = f('2001-10');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-10-0' should be false`, () => {
+        const res = f('2001-10');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '201-10-41' should be false`, () => {
+        const res = f('2001-10');
+        assert.strictEqual(res, false);
+      });
     });
   });
 });

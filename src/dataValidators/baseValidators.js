@@ -1,3 +1,4 @@
+const { Range } = require('../utils.js');
 const { isNullNum, isNullStr } = require('./helpers.js');
 
 const MYSQL_CONFIG = {
@@ -40,6 +41,8 @@ function createStringBaseValidator(typeString) {
 
 function createDateBaseValidator(typeString) {
   const [sqlType, isNull] = parseTypeString(typeString);
+  const dr = new Range(0, 31);
+  const mr = new Range(0, 12);
   return (val = null) => {
     if (isNullStr(val)) return isNull ? true : false;
 
@@ -47,6 +50,7 @@ function createDateBaseValidator(typeString) {
     if (dateArr.length < 3) return false;
     const [y, m, d] = dateArr;
     if (y.length !== 4 || m.length !== 2 || d.length !== 2) return false;
+    if (!dr.inRange(+d) || !mr.inRange(+m)) return false;
     val = new Date(...dateArr);
 
     if (Number.isNaN(val.getTime())) return false; //Invalid Date
