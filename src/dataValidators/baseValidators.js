@@ -43,9 +43,10 @@ function createDateBaseValidator(typeString) {
   const mr = new Range(0, 12);
   return (val = null) => {
     if (isNullStr(val)) return !!isNull;
+    if (!(typeof val === 'string') && !(val instanceof String)) return false;
 
     const dateArr = val.split('-');
-    if (dateArr.length < 3) return false;
+    if (dateArr.length !== 3) return false;
     const [y, m, d] = dateArr;
     if (y.length !== 4 || m.length !== 2 || d.length !== 2) return false;
     if (!dr.inRange(+d) || !mr.inRange(+m)) return false;
@@ -61,10 +62,46 @@ function createDateBaseValidator(typeString) {
   };
 }
 
+function createTimeBaseValidator(typeString) {
+  const isNull = parseTypeString(typeString)[1];
+  const hr = new Range(0, 24);
+  const mr = new Range(0, 59);
+  const sr = new Range(0, 59);
+  return (val = null) => {
+    if (isNullStr(val)) return !!isNull;
+    if (!(typeof val === 'string') && !(val instanceof String)) return false;
+
+    const timeArr = val.split(':');
+    if (timeArr.length !== 3) return false;
+    const [h, m, s] = timeArr;
+    if (![h, m, s].every((v) => v.length === 2)) return false;
+    if (!hr.inRange(+h) || !mr.inRange(+m) || !sr.inRange(+s)) return false;
+
+    return true;
+  };
+}
+
+
+function createDateTimeBaseValidator(typeString) {
+  const isNull = parseTypeString(typeString)[1];
+  const dValidator = createDateBaseValidator(`date|${isNull}`);
+  const tValidator = createTimeBaseValidator(`time|${isNull}`);
+  return (val = null) => {
+    try {
+      const [date, time] = val.split(' ');
+      return dValidator(date) && tValidator(time);
+    } catch {
+      return !!isNull;
+    }
+  };
+}
+
 module.exports = {
   createIntBaseValidator,
   createStringBaseValidator,
   createDateBaseValidator,
+  createTimeBaseValidator,
+  createDateTimeBaseValidator,
 
 };
 

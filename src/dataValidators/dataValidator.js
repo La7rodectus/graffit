@@ -4,6 +4,10 @@ const DEFAULT_VALIDATORS_CREATORS = {
   int: [validators.createIntBaseValidator],
   varchar: [validators.createStringBaseValidator],
   char: [validators.createStringBaseValidator],
+  date: [validators.createDateBaseValidator],
+  time: [validators.createTimeBaseValidator],
+  datetime: [validators.createDateTimeBaseValidator],
+
 };
 
 class DatabaseDataValidator {
@@ -45,6 +49,10 @@ class DatabaseDataValidator {
     const typeRegEx = /^[a-zA-Z]+/g;
     const [type] = rowType.match(typeRegEx);
     const creators = DEFAULT_VALIDATORS_CREATORS[type];
+    if (!creators) {
+      console.warn('Unsupported data type:', type);
+      return [];
+    }
     return creators.map((creator) => creator(rowType));
   }
 

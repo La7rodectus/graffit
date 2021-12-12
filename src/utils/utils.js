@@ -10,8 +10,6 @@ class Range {
     this.#stop = stop;
     this.#step = step;
     this.r = this.#fillRange();
-    this.from = Math.min(...this.r);
-    this.to = Math.max(...this.r);
   }
 
   #fillRange() {
@@ -31,7 +29,7 @@ class Range {
   }
 
   inRange(num) {
-    return !!(num >= this.from && num <= this.to);
+    return this.r.includes(num);
   }
 }
 
