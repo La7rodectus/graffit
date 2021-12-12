@@ -16,6 +16,7 @@ class ConnectionController {
     this.ee.addListener('release', this.#destroyConn.bind(this));
     this.ee.addListener('connDestroyed', this.#unregisterConn.bind(this));
 
+    // eslint-disable-next-line no-undef
     this.finalizer = new FinalizationRegistry((heldVal) => this.destroy.bind(heldVal));
     this.finalizer.register(this, { registeredConnections: this.registeredConnections });
 
@@ -39,13 +40,13 @@ class ConnectionController {
 
   #registerConn(conn) {
     this.registeredConnections.set(conn.threadId, conn);
-    console.log('reg conn', conn.threadId)
+    console.log('reg conn', conn.threadId);
     this.#updateConnCounter();
   }
 
   #unregisterConn(conn) {
     this.registeredConnections.delete(conn.threadId);
-    console.log('unreg conn', conn.threadId)
+    console.log('unreg conn', conn.threadId);
     this.#updateConnCounter();
   }
 
@@ -60,24 +61,24 @@ class ConnectionController {
       this.#destroyConn(conn);
     }
   }
-  
+
   async createConn() {
     const connLimit = this.options.maxConn;
     if (this.totalConn >= connLimit) return { conn: null, err: `Conn limit is ${connLimit}` };
     try {
       const conn = ConnectionService.wrap(await this.cs.create(), this.ee);
       const cErr = await this.cs.connect(conn);
-      if (cErr) return {conn: null, err: cErr};
+      if (cErr) return { conn: null, err: cErr };
       this.#registerConn(conn);
       return { conn, err: null };
     } catch (err) {
       return { conn: null, err };
     }
-  } 
+  }
 
   async getConnection() {
-    const res = Object.create({conn: null, err: null});
-    const {conn, err} = await this.createConn();
+    const res = Object.create({ conn: null, err: null });
+    const { conn, err } = await this.createConn();
     if (err) {
       res.err = err;
       return res;

@@ -5,8 +5,8 @@ class ConnectionService  {
     this.driver = require(driverName);
   }
 
-  async create() {
-    return await this.driver.createConnection(this.connObj);
+  create() {
+    return this.driver.createConnection(this.connObj);
   }
 
   connect = (conn) => new Promise((resolve) => {

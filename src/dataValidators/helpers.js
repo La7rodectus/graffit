@@ -1,14 +1,14 @@
 
 function isNullCheck(val) {
-  return (!val && !Number.isNaN(val));
+  return !val && !Number.isNaN(val);
 }
 
 function isNullStr(str) {
-  return (isNullCheck(str) && str !== '');
+  return isNullCheck(str) && str !== '';
 }
 
 function isNullNum(num) {
-  return (isNullCheck(num) && num !== 0);
+  return isNullCheck(num) && num !== 0;
 }
 
 
@@ -16,4 +16,4 @@ function isNullNum(num) {
 module.exports = {
   isNullStr,
   isNullNum,
-}
+};

@@ -5,7 +5,7 @@ class MysqlDataValidator extends DatabaseDataValidator {
     super(schema);
   }
 
- 
+
 
 }
 

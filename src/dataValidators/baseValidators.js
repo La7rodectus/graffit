@@ -7,7 +7,7 @@ const MYSQL_CONFIG = {
     to: new Date('9999-12-31'),
     format: 'YYYY-MM-DD',
   }
-}
+};
 
 function parseTypeString(str) {
   return str.split('|');
@@ -15,36 +15,34 @@ function parseTypeString(str) {
 
 function createIntBaseValidator(typeString) {
   const [sqlType, isNull] = parseTypeString(typeString);
-  let [type, len] = sqlType.slice(0, -1).split('(');
-  len = +len;
+  const len = +sqlType.slice(0, -1).split('(')[1];
   return (val = null) => {
-    if (isNullNum(val)) return isNull ? true : false;
+    if (isNullNum(val)) return !!isNull;
 
     if (!Number.isInteger(val)) return false;
     if (Math.abs(val).toString().length > len) return false;
     return true;
-  }
+  };
 }
 
 function createStringBaseValidator(typeString) {
   const [sqlType, isNull] = parseTypeString(typeString);
-  let [type, len] = sqlType.slice(0, -1).split('(');
-  len = +len;
+  const len = +sqlType.slice(0, -1).split('(')[1];
   return (val = null) => {
-    if (isNullStr(val)) return isNull ? true : false;
+    if (isNullStr(val)) return !!isNull;
 
     if (!(typeof val === 'string') && !(val instanceof String)) return false;
     if (val.length > len) return false;
     return true;
-  }
+  };
 }
 
 function createDateBaseValidator(typeString) {
-  const [sqlType, isNull] = parseTypeString(typeString);
+  const isNull = parseTypeString(typeString)[1];
   const dr = new Range(0, 31);
   const mr = new Range(0, 12);
   return (val = null) => {
-    if (isNullStr(val)) return isNull ? true : false;
+    if (isNullStr(val)) return !!isNull;
 
     const dateArr = val.split('-');
     if (dateArr.length < 3) return false;
@@ -55,12 +53,12 @@ function createDateBaseValidator(typeString) {
 
     if (Number.isNaN(val.getTime())) return false; //Invalid Date
 
-    if (val.getTime() > MYSQL_CONFIG.date.to.getTime()
-      || val.getTime() < MYSQL_CONFIG.date.from.getTime()) {
+    if (val.getTime() > MYSQL_CONFIG.date.to.getTime() ||
+      val.getTime() < MYSQL_CONFIG.date.from.getTime()) {
       return false;
     }
     return true;
-  }
+  };
 }
 
 module.exports = {

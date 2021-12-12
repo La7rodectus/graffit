@@ -33,7 +33,7 @@ class DatabaseDataValidator {
       const tableValidator = {};
       const tableFields = table.fields;
       for (const field in tableFields) {
-        let rowType = tableFields[field];
+        const rowType = tableFields[field];
         tableValidator[field] = this.#createValidationFunc(rowType);
       }
       schema.tables[tableName] = tableValidator;
@@ -45,7 +45,7 @@ class DatabaseDataValidator {
     const typeRegEx = /^[a-zA-Z]+/g;
     const [type] = rowType.match(typeRegEx);
     const creators = DEFAULT_VALIDATORS_CREATORS[type];
-    return creators.map((creator => creator(rowType)));
+    return creators.map((creator) => creator(rowType));
   }
 
 }

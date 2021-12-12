@@ -1,5 +1,5 @@
 
 module.exports = {
-  SUPPORTED_DRIVERS = ['mysql'],
+  SUPPORTED_DRIVERS: ['mysql'],
 
 };

@@ -12,11 +12,11 @@ class Range {
     this.r = this.#fillRange();
     this.from = Math.min(...this.r);
     this.to = Math.max(...this.r);
-  };
+  }
 
   #fillRange() {
-    if ((this.#step > 0 && this.#start >= this.#stop)
-     || (this.#step < 0 && this.#start <= this.#stop)) {
+    if ((this.#step > 0 && this.#start >= this.#stop) ||
+     (this.#step < 0 && this.#start <= this.#stop)) {
       return [];
     }
     const res = [];
@@ -31,7 +31,7 @@ class Range {
   }
 
   inRange(num) {
-    return num >= this.from && num <= this.to ? true : false;
+    return !!(num >= this.from && num <= this.to);
   }
 }
 

@@ -1,3 +1,4 @@
+
 const Schema = require('../schemas/schema.js');
 
 class BaseSchemaParser {

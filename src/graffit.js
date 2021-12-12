@@ -9,10 +9,12 @@ class Graffit {
       driver: 'mysql',
     };
     options = options || defaultOptions;
-    if (!SUPPORTED_DRIVERS.includes(options.driver)) throw new Error('This driver is not supported!');
+    if (!SUPPORTED_DRIVERS.includes(options.driver)) {
+      throw new Error('This driver is not supported!');
+    }
     return new DBC(connObj, options);
   }
 
-};
+}
 
 module.exports = Graffit;

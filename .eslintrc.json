@@ -1,0 +1,25 @@
+{
+  "extends": "metarhia",
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "es6": true,
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "arrow-parens": ["error", "always"],
+    "comma-dangle": "off",
+    "handle-callback-err": "off",
+    "consistent-return": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 125,
+        "ignoreUrls": true
+      }
+    ]
+  }
+}
