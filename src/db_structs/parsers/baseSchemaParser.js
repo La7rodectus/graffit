@@ -18,7 +18,6 @@ class BaseSchemaParser {
     try {
       const schema = new Schema();
       const data = await this._getBaseTableNames(conn);
-      console.log(data);
       const tableNames = [];
       for (const row of data) tableNames.push(row['TABLE_NAME']);
       const promises = [];
@@ -46,6 +45,33 @@ class BaseSchemaParser {
         }
         return schema;
       });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  async queryConstraints(conn, schema) {
+    try {
+      const constraints = {};
+      Object.keys(schema.tables).forEach(tableName => constraints[tableName] = {});
+      for (const tableName of Object.keys(schema.tables)) {
+        const data = await this._getConstraintsPerTable(conn, tableName);
+        for (const packet of data) {
+          if (packet.CONSTRAINT_NAME !== 'PRIMARY') {
+            const refTableName = packet.REFERENCED_TABLE_NAME;
+            const refColumnName = packet.REFERENCED_COLUMN_NAME;
+            const columnName = packet.COLUMN_NAME;
+            const constraintName = packet.CONSTRAINT_NAME;
+            if (!constraints[tableName].hasOwnProperty(refTableName)) constraints[tableName][refTableName] = {};
+            if (!constraints[refTableName].hasOwnProperty(tableName)) constraints[refTableName][tableName] = {};
+            constraints[tableName][refTableName][constraintName] = [columnName, refColumnName]; 
+            constraints[refTableName][tableName][constraintName] = [refColumnName, columnName]; 
+          }
+        }
+      }
+      // console.dir(constraints, {depth: 4});
+      return constraints;
     } catch (err) {
       console.log(err);
       throw err;

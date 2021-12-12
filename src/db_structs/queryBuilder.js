@@ -11,6 +11,8 @@ class QueryBuilder {
   #alias;
   #aliases;
   #stringsGenerator;
+  #constraints;
+  #nestTables;
   constructor(firstQuery, connProvider, table) {
     for (let queryType in firstQuery) {
       if (schemas.hasOwnProperty(queryType)) this.#schema = schemas[queryType]();
@@ -22,6 +24,8 @@ class QueryBuilder {
     this.#alias = this.#table.alias;
     this.#aliases = {};
     this.#stringsGenerator = new UniqueStringsGenerator(this.#aliases);
+    this.#constraints = this.#table.constraints;
+    this.#nestTables = false;
   }
 
   findIndexBySchemaField(field) {
@@ -33,10 +37,11 @@ class QueryBuilder {
 
   async do() {
     const query = this.getFullQuery();
+    const nestTables = this.#nestTables ? '_' : false;
     const {conn, err} = await this.#connProvider.getConnection();
     if (err) return {conn, err};
     return new Promise((resolve, reject) => {
-      conn.query({sql: query, nestTables: '_' }, (err, result) => {
+      conn.query({sql: query, nestTables }, (err, result) => {
         conn.release();
         if (err) reject(err);
         else resolve(result);
@@ -57,7 +62,7 @@ class QueryBuilder {
   }
 
   editSchema(expressionName, query) {
-    this.#schema[this.findIndexBySchemaField(expressionName)][expressionName] = query;
+    this.#schema[this.findIndexBySchemaField(expressionName)][expressionName] += query;
   }
 
   where(field) {
@@ -140,27 +145,41 @@ class QueryBuilder {
 
   join(table, key1 = null, key2 = null) {
     const tableName = table.name;
-    let keys1 = null;
+    let fkeys = [];
+    let pkey = null;
     if (key1 === null && key2 === null) {
-      keys1 = this.#table.FK;
-      key2 = table.PK;
+      const cstrs = this.#constraints[this.#table.name][tableName];
+      for (const name in cstrs) {
+        const fk = cstrs[name][0];
+        fkeys.push(fk);
+        pkey = cstrs[name][1];
+      }
     } else {
-      keys1 = [key1];
+      if (this.#table.PK === key1) {
+        fkeys = [key2];
+        pkey = key1;
+      } else {
+        fkeys = [key1];
+        pkey = key2;
+      }
+      
     }
-    console.log(keys1, key2); // here
+    console.log('pkey', pkey);
+    console.log('fkeys', fkeys);
     const expressionName = 'innerJoin';
     let query = '';
-    for (let key of keys1) {
-      query += this.innerJoinQuery(tableName, key, key2);
+    for (let key of fkeys) {
+      query += this.innerJoinQuery(tableName, key, pkey);
     }
     this.editSchema(expressionName, query);
+    this.#nestTables = true;
     //this.appendToSelect(tableName);
     return this;
   }
 
   innerJoinQuery(tableName, key1, key2) {
-    if (!this.#aliases.hasOwnProperty(tableName + key1)) this.#stringsGenerator.generateUniqueString(tableName, key1);
-    const alias = this.#aliases[tableName + key1];
+    if (!this.#aliases.hasOwnProperty(tableName + '_' +  key1)) this.#stringsGenerator.generateUniqueString(tableName, key1);
+    const alias = this.#aliases[tableName + '_' +  key1];
     return `INNER JOIN ${tableName} ${alias} ON ${alias}.${key2} = ${this.#alias}.${key1} `;
   }
 }

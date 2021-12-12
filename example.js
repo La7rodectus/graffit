@@ -22,23 +22,19 @@ console.log('Example start');
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); //init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
-    res = await dbc.tickets.select()
-                           .where('flight_id')
-                           .more(7)
-                           .or()
-                           .less(2)
-                           .endWhere()
+    res = await dbc.flights.get()
                            .join(dbc.tickets)
-                          .do();
+                           .join(dbc.places)
+                           .do();
   } catch (err) {
     console.log('catch error:', err);
   }
-  //console.log('res:', res);
+  // console.log('res:', res);
   console.log('Example end');
 })();
 
 // chain examples
-// await dbc.flights.select()
+// await dbc.flights.get()
 // .orderBy('flight_name', 'DESC')
 // .where('ticket_price')
 // .between(1, 2000)
