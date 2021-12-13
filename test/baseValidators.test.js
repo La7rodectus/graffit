@@ -362,10 +362,6 @@ describe('BaseValidators', () => {
         const res = f(undefined);
         assert.strictEqual(res, false);
       });
-      it(`Validation null should be false`, () => {
-        const res = f(null);
-        assert.strictEqual(res, false);
-      });
       it(`Validation NaN should be false`, () => {
         const res = f(NaN);
         assert.strictEqual(res, false);
@@ -381,6 +377,54 @@ describe('BaseValidators', () => {
         const res = f(null);
         assert.strictEqual(res, true);
       });
+      it(`Validation '09:00:00' should be true`, () => {
+        const res = f('09:00:00');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '00:00:00' should be true`, () => {
+        const res = f('00:00:00');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '21:44:22' should be true`, () => {
+        const res = f('21:44:22');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '25:44:22' should be false`, () => {
+        const res = f('25:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '25:61:22' should be false`, () => {
+        const res = f('25:61:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '25:01:65' should be false`, () => {
+        const res = f('25:01:65');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '25:01:' should be false`, () => {
+        const res = f('25:01:');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '25::34' should be false`, () => {
+        const res = f('25::34');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation 'as:as:as' should be false`, () => {
+        const res = f('as:as:as');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation undefined should be true`, () => {
+        const res = f(undefined);
+        assert.strictEqual(res, true);
+      });
+      it(`Validation NaN should be false`, () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
+      it(`Validation {} should be false`, () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
     });
   });
 
@@ -395,17 +439,108 @@ describe('BaseValidators', () => {
         const res = f(null);
         assert.strictEqual(res, false);
       });
-      it(`Validation '2001-10-01 21:44:22' should be true`, () => {
-        const res = f('2001-10-01 21:44:22');
+      it(`Validation '2001-10-01 23:44:22' should be true`, () => {
+        const res = f('2001-10-01 23:44:22');
         assert.strictEqual(res, true);
       });
-      
+      it(`Validation '2001-10-01 24:44:22' should be false`, () => {
+        const res = f('2001-10-01 24:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01     23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '  2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 23:44:22  ' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation ' 23:44:22' should be false`, () => {
+        const res = f(' 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 ' should be false`, () => {
+        const res = f('2001-13-01 ');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation undefined should be false`, () => {
+        const res = f(undefined);
+        assert.strictEqual(res, false);
+      });
+      it(`Validation {} should be false`, () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
+      it(`Validation NaN should be false`, () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
+      });
     });
     describe('Create for datetime|null', () => {
-      const f = baseValidators.createTimeBaseValidator('datetime|null');
+      const f = baseValidators.createDateTimeBaseValidator('datetime|null');
       it(`Validation null should be true`, () => {
         const res = f(null);
         assert.strictEqual(res, true);
+      });
+      it(`Validation '2001-10-01 24:44:22' should be false`, () => {
+        const res = f('2001-10-01 24:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-10-01 23:44:22' should be true`, () => {
+        const res = f('2001-10-01 23:44:22');
+        assert.strictEqual(res, true);
+      });
+      it(`Validation '2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01     23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '  2001-13-01 23:44:22' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 23:44:22  ' should be false`, () => {
+        const res = f('2001-13-01 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation ' 23:44:22' should be false`, () => {
+        const res = f(' 23:44:22');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation '2001-13-01 ' should be false`, () => {
+        const res = f('2001-13-01 ');
+        assert.strictEqual(res, false);
+      });
+      it(`Validation undefined should be true`, () => {
+        const res = f(undefined);
+        assert.strictEqual(res, true);
+      });
+      it(`Validation {} should be false`, () => {
+        const res = f({});
+        assert.strictEqual(res, false);
+      });
+      it(`Validation NaN should be false`, () => {
+        const res = f(NaN);
+        assert.strictEqual(res, false);
       });
     });
   });

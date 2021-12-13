@@ -39,8 +39,8 @@ function createStringBaseValidator(typeString) {
 
 function createDateBaseValidator(typeString) {
   const isNull = parseTypeString(typeString)[1];
-  const dr = new Range(0, 31);
-  const mr = new Range(0, 12);
+  const dr = new Range(1, 31);
+  const mr = new Range(1, 12);
   return (val = null) => {
     if (isNullStr(val)) return !!isNull;
     if (!(typeof val === 'string') && !(val instanceof String)) return false;
@@ -64,7 +64,7 @@ function createDateBaseValidator(typeString) {
 
 function createTimeBaseValidator(typeString) {
   const isNull = parseTypeString(typeString)[1];
-  const hr = new Range(0, 24);
+  const hr = new Range(0, 23);
   const mr = new Range(0, 59);
   const sr = new Range(0, 59);
   return (val = null) => {
@@ -87,12 +87,10 @@ function createDateTimeBaseValidator(typeString) {
   const dValidator = createDateBaseValidator(`date|${isNull}`);
   const tValidator = createTimeBaseValidator(`time|${isNull}`);
   return (val = null) => {
-    try {
-      const [date, time] = val.split(' ');
-      return dValidator(date) && tValidator(time);
-    } catch {
-      return !!isNull;
-    }
+    if (isNullStr(val)) return !!isNull;
+    if (!(typeof val === 'string') && !(val instanceof String)) return false;
+    const [date, time] = val.split(' ');
+    return dValidator(date) && tValidator(time);
   };
 }
 

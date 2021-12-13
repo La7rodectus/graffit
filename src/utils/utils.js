@@ -18,7 +18,7 @@ class Range {
       return [];
     }
     const res = [];
-    for (let i = this.#start; this.#step > 0 ? i < this.#stop : i > this.#stop; i += this.#step) {
+    for (let i = this.#start; this.#step > 0 ? i <= this.#stop : i >= this.#stop; i += this.#step) {
       res.push(i);
     }
     return res;
