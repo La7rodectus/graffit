@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/La7rodectus/graffit#readme",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^5.16.0",
     "eslint-config-metarhia": "^7.0.1",
     "eslint-plugin-import": "^2.25.3",
