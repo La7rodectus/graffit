@@ -8,11 +8,11 @@ const defaultOptions = {
 
 //data base controller
 class DBC {
-  constructor(conn_obj, options) {
+  constructor(connObj, options) {
     this.options = { ...defaultOptions, ...options };
     this.parser = new (require(`./db_structs/parsers/${this.options.driver}SchemaParser.js`))();
-    this.dbdv = options.Dbdv || require(`./dataValidators/${this.options.driver}DataValidator.js`); // DatabaseDataValidator
-    this.cc = new ConnectionsController(conn_obj); // ConnectionController
+    this.Dbdv = options.Dbdv || require(`./dataValidators/${this.options.driver}DataValidator.js`); // DatabaseDataValidator
+    this.cc = new ConnectionsController(connObj); // ConnectionController
     this.schema = undefined;
     this.constraints = undefined;
   }
@@ -26,13 +26,13 @@ class DBC {
 
   async init(dbSchema) {
     try {
-      const {conn, err} = await this.getConnection();
+      const { conn, err } = await this.getConnection();
       if (err) throw err;
       this.schema = dbSchema ? dbSchema : await this.parser.queryDbSchema(conn);
       this.constraints = await this.parser.queryConstraints(conn, this.schema);
       conn.release();
-      this.#assignSchema(this.schema, this.constraints);
-      // this.dbdv = new this.dbdv(this.schema);
+      this.#assignSchema(this.schema);
+      this.dbdv = new this.Dbdv(this.schema);
     } catch (err) {
       return err;
     }
@@ -42,8 +42,8 @@ class DBC {
     return this.schema;
   }
 
-  async getConnection() {
-    return await this.cc.getConnection();
+  getConnection() {
+    return this.cc.getConnection();
   }
 
 }

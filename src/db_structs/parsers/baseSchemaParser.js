@@ -1,3 +1,4 @@
+
 const Schema = require('../schemas/schema.js');
 
 class BaseSchemaParser {
@@ -19,7 +20,7 @@ class BaseSchemaParser {
       const schema = new Schema();
       const data = await this._getBaseTableNames(conn);
       const tableNames = [];
-      for (const row of data) tableNames.push(row['TABLE_NAME']);
+      for (const row of data) tableNames.push(row['table_name']);
       const promises = [];
       for (const tName of tableNames) {
         promises.push(this._descTable(conn, tName));

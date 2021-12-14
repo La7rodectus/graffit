@@ -1,3 +1,4 @@
+
 const BaseSchemaParser = require('./baseSchemaParser.js');
 
 class MySqlSchemaParser extends BaseSchemaParser {
@@ -6,7 +7,7 @@ class MySqlSchemaParser extends BaseSchemaParser {
   }
 
   _getBaseTableNames(conn) {
-    const q = `SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'`;
+    const q = 'SELECT table_name FROM information_schema.tables WHERE table_type = \'base table\'';
     return this._exec(q, conn);
   }
 

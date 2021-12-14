@@ -4,6 +4,10 @@ const DEFAULT_VALIDATORS_CREATORS = {
   int: [validators.createIntBaseValidator],
   varchar: [validators.createStringBaseValidator],
   char: [validators.createStringBaseValidator],
+  date: [validators.createDateBaseValidator],
+  time: [validators.createTimeBaseValidator],
+  datetime: [validators.createDateTimeBaseValidator],
+
 };
 
 class DatabaseDataValidator {
@@ -12,6 +16,10 @@ class DatabaseDataValidator {
   }
 
   validate = (tableName, field, val) => this.#callValidators(tableName, field, val);
+
+  addValidator(table, field, ...validators) {
+    this.validationSchema.tables[table][field].contact(validators);
+  }
 
   #callValidators(tableName, field, val) {
     const validators = this.validationSchema.tables[tableName][field];
@@ -29,7 +37,7 @@ class DatabaseDataValidator {
       const tableValidator = {};
       const tableFields = table.fields;
       for (const field in tableFields) {
-        let rowType = tableFields[field];
+        const rowType = tableFields[field];
         tableValidator[field] = this.#createValidationFunc(rowType);
       }
       schema.tables[tableName] = tableValidator;
@@ -41,7 +49,11 @@ class DatabaseDataValidator {
     const typeRegEx = /^[a-zA-Z]+/g;
     const [type] = rowType.match(typeRegEx);
     const creators = DEFAULT_VALIDATORS_CREATORS[type];
-    return creators.map((creator => creator(rowType)));
+    if (!creators) {
+      console.warn('Unsupported data type:', type);
+      return [];
+    }
+    return creators.map((creator) => creator(rowType));
   }
 
 }

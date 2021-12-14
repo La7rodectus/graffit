@@ -1,3 +1,4 @@
+
 class UniqueStringsGenerator {
   #strings;
   constructor(stringsObj) {
@@ -7,10 +8,9 @@ class UniqueStringsGenerator {
   generateUniqueString(tableName, key = '') {
     const letter = tableName.slice(0, 1);
     let string = letter;
-    let i = 1;
     while (Object.values(this.#strings).indexOf(string) !== -1) {
       string = letter;
-      string += i;
+      string += 1;
     }
     this.#strings[tableName + '_' + key] = string;
     return string;
@@ -18,4 +18,4 @@ class UniqueStringsGenerator {
 
 }
 
-module.exports = { UniqueStringsGenerator };
+module.exports = UniqueStringsGenerator;

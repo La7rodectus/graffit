@@ -1,8 +1,9 @@
-const UniqueStringsGenerator = require('../util/UniqueStringsGenerator').UniqueStringsGenerator;
-const SelectSchema = require('./schemas/selectShema.js').SelectSchema;
+const UniqueStringsGenerator = require('../utils/uniqueStringsGenerator');
+const SelectSchema = require('./schemas/selectSchema.js');
+
 const schemas = {
   'select': SelectSchema,
-}
+};
 
 class QueryBuilder {
   #connProvider;
@@ -14,8 +15,8 @@ class QueryBuilder {
   #constraints;
   #nestTables;
   constructor(firstQuery, connProvider, table) {
-    for (let queryType in firstQuery) {
-      if (schemas.hasOwnProperty(queryType)) this.#schema = schemas[queryType]();
+    for (const queryType in firstQuery) {
+      if (schemas[queryType]) this.#schema = schemas[queryType]();
       const startQueryIndex = this.findIndexBySchemaField(queryType);
       this.#schema[startQueryIndex][queryType] = firstQuery[queryType];
     }
@@ -30,10 +31,10 @@ class QueryBuilder {
 
   findIndexBySchemaField(field) {
     for (let i = 0; i < this.#schema.length; i++) {
-      if (this.#schema[i].hasOwnProperty(field)) return i;
+      if (this.#schema[i][field]) return i;
     }
     return null;
-  } 
+  }
 
   async do() {
     const query = this.getFullQuery();
@@ -45,13 +46,13 @@ class QueryBuilder {
         conn.release();
         if (err) reject(err);
         else resolve(result);
-      });      
+      });
     });
   }
 
   getFullQuery() {
     let fullQuery = '';
-    for (let expressionName of this.#schema) {
+    for (const expressionName of this.#schema) {
       const expressionValue = Object.values(expressionName)[0];
       if (expressionValue.length > 0) fullQuery += ' ';
       fullQuery += Object.values(expressionName)[0];
@@ -67,7 +68,9 @@ class QueryBuilder {
 
   where(field) {
     const expressionName = 'where';
-    if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    if (!this.#table.fields[field]) {
+      throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    }
     const queryBuilder = this;
     let query = `WHERE `;
     const whereSelectors = {
@@ -131,14 +134,14 @@ class QueryBuilder {
         queryBuilder.editSchema(expressionName, query);
         return queryBuilder;
       },
-    }
+    };
     return whereSelectors;
   }
 
   orderBy(field, order = 'ASC') {
     const expressionName = 'orderBy';
     if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
-    if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    if (!this.#table.fields[field]) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
     this.editSchema(expressionName, `ORDER BY ${this.#alias}.${field} ${order}`);
     return this;
   }
