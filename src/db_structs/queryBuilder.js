@@ -150,7 +150,7 @@ class QueryBuilder {
     if (key1 === null && key2 === null) {
       const cstrs = this.#constraints[this.#table.name][tableName];
       for (const name in cstrs) {
-        const fk = cstrs[name][0];
+        const [ fk ] = cstrs[name];
         fkeys.push(fk);
         pkey = cstrs[name][1];
       }
@@ -164,8 +164,6 @@ class QueryBuilder {
       }
       
     }
-    console.log('pkey', pkey);
-    console.log('fkeys', fkeys);
     const expressionName = 'innerJoin';
     let query = '';
     for (let key of fkeys) {
