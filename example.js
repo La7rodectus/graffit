@@ -2,10 +2,10 @@
 const Graffit = require('./src/graffit.js');
 
 const connObj = {
-  host: 'sql11.freemysqlhosting.net',
-  user: 'sql11456793',
-  password: 'isiDi4EVFN',
-  database: 'sql11456793',
+  host: 'localhost',
+  user: 'liza',
+  password: '#Cactuz555',
+  database: 'web_aviatickets',
 };
 
 console.log('Example start');
@@ -16,8 +16,8 @@ console.log('Example start');
     const err = await dbc.init(); // init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
     res = await dbc.flights.get()
-                           .join(dbc.places)
-                           .do();
+      .join(dbc.places)
+      .do();
   } catch (err) {
     console.log('catch error:', err);
   }
@@ -25,7 +25,7 @@ console.log('Example start');
   console.log('Example end');
 })();
 
-// chain examples
+//chain examples
 // await dbc.flights.get()
 // .orderBy('flight_name', 'DESC')
 // .where('ticket_price')

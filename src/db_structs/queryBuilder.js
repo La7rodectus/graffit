@@ -31,7 +31,7 @@ class QueryBuilder {
 
   findIndexBySchemaField(field) {
     for (let i = 0; i < this.#schema.length; i++) {
-      if (this.#schema[i][field]) return i;
+      if (this.#schema[i].hasOwnProperty([field])) return i;
     }
     return null;
   }
@@ -68,7 +68,7 @@ class QueryBuilder {
 
   where(field) {
     const expressionName = 'where';
-    if (!this.#table.fields[field]) {
+    if (!this.#table.fields.hasOwnProperty(field)) {
       throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
     }
     const queryBuilder = this;
@@ -141,7 +141,7 @@ class QueryBuilder {
   orderBy(field, order = 'ASC') {
     const expressionName = 'orderBy';
     if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
-    if (!this.#table.fields[field]) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
     this.editSchema(expressionName, `ORDER BY ${this.#alias}.${field} ${order}`);
     return this;
   }

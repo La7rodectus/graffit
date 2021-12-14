@@ -31,7 +31,7 @@ class DBC {
       this.schema = dbSchema ? dbSchema : await this.parser.queryDbSchema(conn);
       this.constraints = await this.parser.queryConstraints(conn, this.schema);
       conn.release();
-      this.#assignSchema(this.schema);
+      this.#assignSchema(this.schema, this.constraints);
       this.dbdv = new this.Dbdv(this.schema);
     } catch (err) {
       return err;
