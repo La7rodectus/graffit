@@ -1,11 +1,9 @@
-const UniqueStringsGenerator = require('../utils/uniqueStringsGenerator');
-const SelectSchema = require('./schemas/selectSchema.js');
+const UniqueStringsGenerator = require('../../utils/uniqueStringsGenerator');
+const { wrapString } = require('../../utils/helpers.js');
+const BaseQueryBuilder = require('./baseQueryBuilder');
+const schema = require('../schemas/selectSchema.js');
 
-const schemas = {
-  'select': SelectSchema,
-};
-
-class QueryBuilder {
+class SelectQueryBuilder extends BaseQueryBuilder {
   #connProvider;
   #table;
   #schema;
@@ -14,19 +12,27 @@ class QueryBuilder {
   #stringsGenerator;
   #constraints;
   #nestTables;
+  #validate;
   constructor(firstQuery, connProvider, table) {
+    super();
+    this.queryType = 'select';
+    this.#schema = schema();
     for (const queryType in firstQuery) {
-      if (schemas[queryType]) this.#schema = schemas[queryType]();
-      const startQueryIndex = this.findIndexBySchemaField(queryType);
-      this.#schema[startQueryIndex][queryType] = firstQuery[queryType];
+      this.editSchema(queryType, firstQuery[queryType]);
     }
     this.#connProvider = connProvider;
     this.#table = table;
     this.#alias = this.#table.alias;
-    this.#aliases = {};
+    const main = this.#alias;
+    this.#aliases = { main };
     this.#stringsGenerator = new UniqueStringsGenerator(this.#aliases);
     this.#constraints = this.#table.constraints;
     this.#nestTables = false;
+    this.#validate = (field, value) => {
+      if (!this.#table.validator(field, value)) {
+        throw new Error(`Value *${value}* is not valid for field ${field}`);
+      }
+    };
   }
 
   findIndexBySchemaField(field) {
@@ -37,29 +43,8 @@ class QueryBuilder {
   }
 
   async do() {
-    const query = this.getFullQuery();
-    const nestTables = this.#nestTables ? '_' : false;
-    const {conn, err} = await this.#connProvider.getConnection();
-    if (err) return {conn, err};
-    return new Promise((resolve, reject) => {
-      conn.query({sql: query, nestTables }, (err, result) => {
-        conn.release();
-        if (err) reject(err);
-        else resolve(result);
-      });
-    });
-  }
-
-  getFullQuery() {
-    let fullQuery = '';
-    for (const expressionName of this.#schema) {
-      const expressionValue = Object.values(expressionName)[0];
-      if (expressionValue.length > 0) fullQuery += ' ';
-      fullQuery += Object.values(expressionName)[0];
-    }
-    fullQuery += ';';
-    console.log('full query', fullQuery);
-    return fullQuery;
+    const result = await super.do(this.#nestTables, this.#connProvider, this.#schema);
+    return result;
   }
 
   editSchema(expressionName, query) {
@@ -91,6 +76,8 @@ class QueryBuilder {
         return this;
       },
       equals(value, cmpField = field) {
+        queryBuilder.#validate(cmpField, value);
+        value = wrapString(value);
         query += `${queryBuilder.#alias}.${cmpField} = ${value}`;
         return this;
       },
@@ -99,10 +86,12 @@ class QueryBuilder {
         return this;
       },
       notEquals(value, cmpField = field) {
+        queryBuilder.#validate(cmpField, value);
         query += `${queryBuilder.#alias}.${cmpField} <> ${value}`;
         return this;
       },
       less(value, cmpField = field, equalsBool = false) {
+        queryBuilder.#validate(cmpField, value);
         if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
         let eq = '';
         if (equalsBool) eq += '=';
@@ -110,6 +99,7 @@ class QueryBuilder {
         return this;
       },
       more(value, cmpField = field, equalsBool = false) {
+        queryBuilder.#validate(cmpField, value);
         if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
         let eq = '';
         if (equalsBool) eq += '=';
@@ -117,8 +107,8 @@ class QueryBuilder {
         return this;
       },
       between(value1, value2, cmpField = field) {
-        if (typeof value1 !== 'number') throw new Error(`Value ${value1} should be of type number`);
-        if (typeof value2 !== 'number') throw new Error(`Value ${value2} should be of type number`);
+        queryBuilder.#validate(cmpField, value1);
+        queryBuilder.#validate(cmpField, value2);
         query += `${queryBuilder.#alias}.${cmpField} BETWEEN ${value1} AND ${value2}`;
         return this;
       },
@@ -141,7 +131,9 @@ class QueryBuilder {
   orderBy(field, order = 'ASC') {
     const expressionName = 'orderBy';
     if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
-    if (!this.#table.fields.hasOwnProperty(field)) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    if (!this.#table.fields.hasOwnProperty(field)) {
+      throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    }
     this.editSchema(expressionName, `ORDER BY ${this.#alias}.${field} ${order}`);
     return this;
   }
@@ -150,31 +142,27 @@ class QueryBuilder {
     const tableName = table.name;
     let fkeys = [];
     let pkey = null;
-    if (key1 === null && key2 === null) {
+    if (!key1 && !key2) {
       const cstrs = this.#constraints[this.#table.name][tableName];
       for (const name in cstrs) {
         const [ fk ] = cstrs[name];
         fkeys.push(fk);
         pkey = cstrs[name][1];
       }
+    } else if (this.#table.PK === key1) {
+      fkeys = [key2];
+      pkey = key1;
     } else {
-      if (this.#table.PK === key1) {
-        fkeys = [key2];
-        pkey = key1;
-      } else {
-        fkeys = [key1];
-        pkey = key2;
-      }
-      
+      fkeys = [key1];
+      pkey = key2;
     }
     const expressionName = 'innerJoin';
     let query = '';
-    for (let key of fkeys) {
+    for (const key of fkeys) {
       query += this.innerJoinQuery(tableName, key, pkey);
     }
     this.editSchema(expressionName, query);
     this.#nestTables = true;
-    //this.appendToSelect(tableName);
     return this;
   }
 
@@ -185,4 +173,4 @@ class QueryBuilder {
   }
 }
 
-module.exports = QueryBuilder;
+module.exports = SelectQueryBuilder;

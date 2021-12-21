@@ -10,18 +10,17 @@ const connObj = {
 
 console.log('Example start');
 (async () => {
-  let res;
   try {
     const dbc = Graffit.createController(connObj);
     const err = await dbc.init(); // init => error | other methods => client wrap in try catch
     if (err) return console.log('const error connect:', err);
-    res = await dbc.flights.get()
-      .join(dbc.places)
-      .do();
+    const pl = await dbc.places.insert({ 'place_name': 'Шанхай' }, { 'place_name': 'Нью-Делі' }).do();
+    console.log('pl', pl);
+    const res = await dbc.places.get().do();
+    console.log('res:', res);
   } catch (err) {
     console.log('catch error:', err);
   }
-  console.log('res:', res);
   console.log('Example end');
 })();
 
