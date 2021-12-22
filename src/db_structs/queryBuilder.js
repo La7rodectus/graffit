@@ -1,3 +1,4 @@
+const { InvalidArgumentType, UnknownField } = require('../errors');
 const UniqueStringsGenerator = require('../utils/uniqueStringsGenerator');
 const SelectSchema = require('./schemas/selectSchema.js');
 
@@ -65,7 +66,7 @@ class QueryBuilder {
   where(field) {
     const expressionName = 'where';
     if (!this.#table.fields[field]) {
-      throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+      throw new ReferenceError(`Field ${field} does not exist in table ${this.#table.name}`);
     }
     const queryBuilder = this;
     let query = `WHERE `;
@@ -99,22 +100,22 @@ class QueryBuilder {
         return this;
       },
       less(value, cmpField = field, equalsBool = false) {
-        if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
+        if (typeof value !== 'number') throw new InvalidArgumentType(value, 'number');
         let eq = '';
         if (equalsBool) eq += '=';
         query += `${queryBuilder.#alias}.${cmpField} <${eq} ${value}`;
         return this;
       },
       more(value, cmpField = field, equalsBool = false) {
-        if (typeof value !== 'number') throw new Error(`Value ${value} should be of type number`);
+        if (typeof value !== 'number') thrownew InvalidArgumentType(value, 'number');
         let eq = '';
         if (equalsBool) eq += '=';
         query += `${queryBuilder.#alias}.${cmpField} >${eq} ${value}`;
         return this;
       },
       between(value1, value2, cmpField = field) {
-        if (typeof value1 !== 'number') throw new Error(`Value ${value1} should be of type number`);
-        if (typeof value2 !== 'number') throw new Error(`Value ${value2} should be of type number`);
+        if (typeof value1 !== 'number') throw new InvalidArgumentType(value, 'number');
+        if (typeof value2 !== 'number') throw new InvalidArgumentType(value, 'number');
         query += `${queryBuilder.#alias}.${cmpField} BETWEEN ${value1} AND ${value2}`;
         return this;
       },
@@ -136,8 +137,8 @@ class QueryBuilder {
 
   orderBy(field, order = 'ASC') {
     const expressionName = 'orderBy';
-    if (order !== 'ASC' && order !== 'DESC') throw new Error('Parameter order should be "ASC" or "DESC"');
-    if (!this.#table.fields[field]) throw new Error(`Field ${field} does not exist in table ${this.#table.name}`);
+    if (order !== 'ASC' && order !== 'DESC') throw new InvalidArgumentType(order, 'ASC|DESC');
+    if (!this.#table.fields[field]) throw new UnknownField(field);
     this.editSchema(expressionName, `ORDER BY ${this.#alias}.${field} ${order}`);
     return this;
   }
