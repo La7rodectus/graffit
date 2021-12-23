@@ -7,16 +7,16 @@
 - [Insert](#insert)  
 - [Update](#update)  
 - [Delete](#delete)  
-### About ###
+## About ##
 Hello! Graffit is a lib for easy work with DB. Currently we are in process of development, so not many features are available.  
 
-### Purposes ###
+## Purposes ##
 Our goal for now is to provide a simple and similar structure for any SQL database ( for now only mysql is supported).
 
-### Creating and using connections ###  
-*this part is under development*
-See example of creating and using connections[here](example.js)
-#### class Graffit ####
+## Creating and using connections ##  
+*this part is under development*  
+See example of creating and using connections [here](example.js).
+### class Graffit ###
 
 constructor(): do nothing
 
@@ -39,7 +39,7 @@ readSchema(conn_obj): object of DB schema
 }
 ```
 
-#### class DBC ####
+### class DBC ###
 
 dbc.
 constructor(schema, options): do nothing
@@ -54,9 +54,9 @@ const defaultOptions = {
 ```
 
 init(): create first connection to DB
-### Select ###
+## Select ##
 *select works, but documentation is in development*
-### Insert ###
+## Insert ##
 Using *Insert* is pretty easy. All you need to do is call method insert on table, which you want to use.  
 Inside you should pass an object, containing names of fields as keys and values, corresponding each other.  
 Do not forget to call *do()*.
@@ -68,8 +68,8 @@ To insert many rows at once pass into the insert method many objects, correspond
 dbc.sqlTable.insert({field1: 'value11', field2: 'value21'}, {field1: 'value12', field2: 'value22'}).do();
 ```
 Please, note, that structure of objects should be the same (keys in each object should match).
-### Update ###
+## Update ##
 *no implementation yet*
-### Delete ###
+## Delete ##
 *no implementation yet*
 
