@@ -1,4 +1,3 @@
-
 function SelectSchema() {
   return [
     { select: '' },

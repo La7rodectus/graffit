@@ -1,11 +1,58 @@
-# Graffit Usage #  
+# Graffit #  
 ## Table Of Contents ##
+- [About](#about)  
+- [Purposes](#purposes)
 - [Creating and using connections](#creating-and-using-connections)  
 - [Select](#select)  
 - [Insert](#insert)  
 - [Update](#update)  
 - [Delete](#delete)  
+### About ###
+Hello! Graffit is a lib for easy work with DB. Currently we are in process of development, so not many features are available.  
+
+### Purposes ###
+Our goal for now is to provide a simple and similar structure for any SQL database ( for now only mysql is supported).
+
 ### Creating and using connections ###  
+* this part is under development *
+#### class Graffit ####
+
+constructor(): do nothing
+
+createController(conn_obj, options): dbc class for connected DB
+
+readSchema(conn_obj): object of DB schema
+
+```
+{
+  name: null,
+  tables: {
+    Persons: {
+      PersonID: 'int(11)',
+      LastName: 'varchar(255)',
+      FirstName: 'varchar(255)',
+      Address: 'varchar(255)',
+      City: 'varchar(255)'
+    }
+  }
+}
+```
+
+#### class DBC ####
+
+dbc.
+constructor(schema, options): do nothing
+this.[tableName] = new Table(name)
+
+
+```
+const defaultOptions = {
+  dbdv: DatabaseDataValidator,
+  maxConnectionsPull: 5,
+};
+```
+
+init(): create first connection to DB
 ### Select ###
 *select works, but documentation is in development*
 ### Insert ###
@@ -24,3 +71,4 @@ Please, note, that structure of objects should be the same (keys in each object 
 *no implementation yet*
 ### Delete ###
 *no implementation yet*
+

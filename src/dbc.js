@@ -14,12 +14,13 @@ class DBC {
     this.Dbdv = options.Dbdv || require(`./dataValidators/${this.options.driver}DataValidator.js`); // DatabaseDataValidator
     this.cc = new ConnectionsController(connObj); // ConnectionController
     this.schema = undefined;
+    this.constraints = undefined;
   }
 
-  #assignSchema(schema) {
+  #assignSchema(schema, constraints) {
     const tables = schema.getTables();
     for (const table of Object.values(tables)) {
-      this[table.name] = new SqlTable(this, table);
+      this[table.name] = new SqlTable(this, table, constraints, this.dbdv);
     }
   }
 
@@ -28,9 +29,10 @@ class DBC {
       const { conn, err } = await this.getConnection();
       if (err) throw err;
       this.schema = dbSchema ? dbSchema : await this.parser.queryDbSchema(conn);
+      this.constraints = await this.parser.queryConstraints(conn, this.schema);
       conn.release();
-      this.#assignSchema(this.schema);
       this.dbdv = new this.Dbdv(this.schema);
+      this.#assignSchema(this.schema, this.constraints);
     } catch (err) {
       return err;
     }

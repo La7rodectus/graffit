@@ -1,3 +1,4 @@
+const { UnknownField } = require('../errors.js');
 const validators = require('./baseValidators.js');
 
 const DEFAULT_VALIDATORS_CREATORS = {
@@ -23,6 +24,7 @@ class DatabaseDataValidator {
 
   #callValidators(tableName, field, val) {
     const validators = this.validationSchema.tables[tableName][field];
+    if (!validators) throw new UnknownField(field);
     for (const validator of validators) {
       if (!validator(val)) return false;
     }
