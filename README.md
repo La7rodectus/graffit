@@ -1,8 +1,10 @@
 # Graffit
-lib for easy work with DB
+Hello! Graffit is a lib for easy work with DB. Currently we are in process of development, so not many features are available.  
+  
+
 
 ## Purposes
-
+Our goal for now is to provide a simple and similar structure for any SQL database ( for now only mysql is supported).
 
 ## Methods
 ### class Graffit
