@@ -5,6 +5,8 @@
   "main": "example.js",
   "scripts": {
     "start": "node example.js",
+    "env:up": "docker compose up -d",
+    "env:down": "docker compose down",
     "test": "mocha",
     "lint": "eslint ."
   },
@@ -27,6 +29,7 @@
     "mocha": "^9.1.3"
   },
   "dependencies": {
+    "dotenv": "^16.0.0",
     "mysql": "^2.18.1"
   }
 }
