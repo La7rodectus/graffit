@@ -1,11 +1,14 @@
+require('dotenv').config();
 
-const Graffit = require('./src/graffit.js');
+const Graffit = require('../src/graffit');
 
+
+const { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE } = process.env;
 const connObj = {
-  host: 'localhost',
-  user: 'liza',
-  password: '#Cactuz555',
-  database: 'web_aviatickets',
+  host: MYSQL_HOST,
+  user: MYSQL_USER,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DATABASE,
 };
 
 console.log('Example start');

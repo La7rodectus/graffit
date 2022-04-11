@@ -4,7 +4,7 @@
   "description": "ORM for Node.js",
   "main": "example.js",
   "scripts": {
-    "start": "node example.js",
+    "start": "node ./examples",
     "env:up": "docker compose up -d",
     "env:down": "docker compose down",
     "test": "mocha",
