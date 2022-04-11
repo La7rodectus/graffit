@@ -5,6 +5,8 @@
   "main": "example.js",
   "scripts": {
     "start": "node example.js",
+    "env:up": "docker compose up -d",
+    "env:down": "docker compose down",
     "test": "mocha",
     "lint": "eslint ."
   },
@@ -20,13 +22,17 @@
   },
   "homepage": "https://github.com/La7rodectus/graffit#readme",
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
+    "@babel/core": "^7.17.8",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/eslint-plugin": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "eslint": "^8.12.0",
     "eslint-config-metarhia": "^7.0.1",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.25.4",
     "mocha": "^9.1.3"
   },
   "dependencies": {
+    "dotenv": "^16.0.0",
     "mysql": "^2.18.1"
   }
 }

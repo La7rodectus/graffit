@@ -4,7 +4,10 @@
     "es6": true,
     "node": true
   },
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "plugins": [
+		"@babel"
+	],
   "parserOptions": {
     "es6": true,
     "ecmaVersion": "latest",

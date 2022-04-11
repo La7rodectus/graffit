@@ -62,5 +62,6 @@ module.exports = {
   InvalidNumberOfArguments,
   SyntaxError,
   UnknownField,
+  GraffitError
 
 };
